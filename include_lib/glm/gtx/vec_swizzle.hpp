@@ -177,19 +177,16 @@ namespace glm {
 		return glm::vec<2, T, Q>(v.w, v.y);
 	}
 
-	// wz
 	template<typename T, qualifier Q>
 	GLM_INLINE glm::vec<2, T, Q> wz(const glm::vec<4, T, Q> &v) {
 		return glm::vec<2, T, Q>(v.w, v.z);
 	}
 
-	// ww
 	template<typename T, qualifier Q>
 	GLM_INLINE glm::vec<2, T, Q> ww(const glm::vec<4, T, Q> &v) {
 		return glm::vec<2, T, Q>(v.w, v.w);
 	}
 
-	// xxx
 	template<typename T, qualifier Q>
 	GLM_INLINE glm::vec<3, T, Q> xxx(const glm::vec<1, T, Q> &v) {
 		return glm::vec<3, T, Q>(v.x, v.x, v.x);

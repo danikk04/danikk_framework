@@ -2,6 +2,8 @@
 #include <danikk_framework/danikk_framework.h>
 #include <danikk_framework/log.h>
 #include <danikk_framework/number.h>
+#include <danikk_framework/random.h>
+#include <danikk_framework/math.h>
 #include <assert.h>
 
 #include <glm/glm.hpp>
@@ -52,6 +54,12 @@ namespace danikk_framework
 	}
 
 	LOG_OPERATOR(glm::vec3 data)
+	{
+		formatWrite(out, "%,%,%", data.x, data.y, data.z);
+		return out;
+	}
+
+	LOG_OPERATOR(glm::ivec3 data)
 	{
 		formatWrite(out, "%,%,%", data.x, data.y, data.z);
 		return out;
@@ -169,5 +177,25 @@ namespace danikk_framework
 				parseNumber<uint32>(data[0]),
 				parseNumber<uint32>(data[1]),
 				parseNumber<uint32>(data[0]));
+	}
+
+	inline vec2 randVec2()
+	{
+		return vec2(default_random.nextFloat(), default_random.nextFloat());
+	}
+
+	inline vec3 randVec3()
+	{
+		return vec3(default_random.nextFloat(), default_random.nextFloat(), default_random.nextFloat());
+	}
+
+	inline vec3 truncateTo100(vec3 vector)
+	{
+		return vec3(truncateTo100(vector.x), truncateTo100(vector.y), truncateTo100(vector.z));
+	}
+
+	inline vec3 spreadDirection(vec3 direction, float random_factor)
+	{
+		return glm::normalize(randVec3() * random_factor + direction);
 	}
 }

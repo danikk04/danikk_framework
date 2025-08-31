@@ -660,10 +660,6 @@ namespace gtc
 		vec<3, T, Q> i1(min(g, vec<3, T, Q>(l.z, l.x, l.y)));
 		vec<3, T, Q> i2(max(g, vec<3, T, Q>(l.z, l.x, l.y)));
 
-		//   x0 = x0 - 0.0 + 0.0 * C.xxx;
-		//   x1 = x0 - i1  + 1.0 * C.xxx;
-		//   x2 = x0 - i2  + 2.0 * C.xxx;
-		//   x3 = x0 - 1.0 + 3.0 * C.xxx;
 		vec<3, T, Q> x1(x0 - i1 + C.x);
 		vec<3, T, Q> x2(x0 - i2 + C.y); // 2.0*C.x = 1/3 = C.y
 		vec<3, T, Q> x3(x0 - D.y);      // -1.0+3.0*C.x = -0.5 = -D.y

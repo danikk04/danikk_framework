@@ -161,6 +161,17 @@ namespace danikk_framework
 	    }
 	}
 
+	inline void strreplacefirst8(char* string, char from, char to)
+	{
+		for(index_t i = 0; i < 8; i++)
+		{
+			if(string[i] == from)
+			{
+				string[i] = to;
+			}
+		}
+	}
+
 	//Пропускает текст, пока текущий символ совпадает с одним из заданных.
 	CSTRING_TEMPLATE strskipchars(cstringT str, const char chr1, const char chr2)
 	{

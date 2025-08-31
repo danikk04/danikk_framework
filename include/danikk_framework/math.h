@@ -79,4 +79,19 @@ namespace danikk_framework
 			v = v / sum;
 		}
 	}
+
+	inline float truncateTo100(float value)
+	{
+		return ((float)(int)(value * 100.0f)) / 100.0f;
+	}
+
+	inline int mod(int a, int b)
+	{
+		int result = a % b;
+		if(result < 0)
+		{
+			result = b + result;
+		}
+		return result;
+	}
 }

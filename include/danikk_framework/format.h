@@ -287,6 +287,39 @@ namespace danikk_framework
 		return out;
 	}
 
+	struct truncated_display
+	{
+		float value;
+		uint32 count;
+
+		truncated_display(float value, uint32 count) : value(value), count(count){}
+	};
+
+	template<class stream_t> stream_t& operator << (stream_t& out, const truncated_display& data)
+	{
+		char buffer[64];
+		writeNumberToStringBuffer(data.value, buffer, 64);
+		char* current_char = buffer;
+
+		while(*current_char != '.')
+		{
+			out << *current_char;
+			current_char++;
+		}
+
+		current_char++;
+		uint count = data.count;
+
+		while(*current_char != '\0' && count > 0)
+		{
+			out << (char)*current_char;
+			current_char++;
+			count--;
+		}
+
+		return out;
+	}
+
 	/*template<class array_t> struct array_string_display
 	{
 		array_t& array;

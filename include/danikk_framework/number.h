@@ -20,7 +20,7 @@ namespace danikk_framework
 		}
 		else if constexpr(std::is_same<numberT, float>::value)
 		{
-			len = printToBuffer("%f", float);
+			len = printToBuffer("%.2f", float);
 		}
 		else if constexpr(std::is_same<numberT, double>::value)
 		{
