@@ -254,5 +254,11 @@ namespace danikk_framework
 			}
 			return *result;
 		}
+
+		value_t& duplicateLast()
+		{
+			push(last());
+			return last();
+		}
 	};
 }

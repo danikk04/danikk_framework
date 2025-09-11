@@ -16,6 +16,7 @@ namespace danikk_framework
 	using glm::uvec2;
 	using glm::vec2;
 	using glm::uvec3;
+	using glm::ivec3;
 	using glm::vec3;
 
 #define pi glm::pi<float>()
@@ -37,37 +38,37 @@ namespace danikk_framework
 
 	LOG_OPERATOR(glm::vec2 data)
 	{
-		formatWrite(out, "%,%", data.x, data.y);
+		formatWrite(out, "%/%", data.x, data.y);
 		return out;
 	}
 
 	LOG_OPERATOR(glm::uvec2 data)
 	{
-		formatWrite(out, "%,%", data.x, data.y);
+		formatWrite(out, "%/%", data.x, data.y);
 		return out;
 	}
 
 	LOG_OPERATOR(glm::ivec2 data)
 	{
-		formatWrite(out, "%,%", data.x, data.y);
+		formatWrite(out, "%/%", data.x, data.y);
 		return out;
 	}
 
 	LOG_OPERATOR(glm::vec3 data)
 	{
-		formatWrite(out, "%,%,%", data.x, data.y, data.z);
+		formatWrite(out, "%/%/%", data.x, data.y, data.z);
 		return out;
 	}
 
 	LOG_OPERATOR(glm::ivec3 data)
 	{
-		formatWrite(out, "%,%,%", data.x, data.y, data.z);
+		formatWrite(out, "%/%/%", data.x, data.y, data.z);
 		return out;
 	}
 
 	LOG_OPERATOR(glm::uvec3 data)
 	{
-		formatWrite(out, "%,%,%", data.x, data.y, data.z);
+		formatWrite(out, "%/%/%", data.x, data.y, data.z);
 		return out;
 	}
 
@@ -197,5 +198,10 @@ namespace danikk_framework
 	inline vec3 spreadDirection(vec3 direction, float random_factor)
 	{
 		return glm::normalize(randVec3() * random_factor + direction);
+	}
+
+	inline ivec3 mod(ivec3 x, ivec3 y)
+	{
+		return ivec3(mod(x.x, y.x), mod(x.y, y.y), mod(x.z, y.z));
 	}
 }

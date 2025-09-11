@@ -8,6 +8,44 @@
 
 namespace danikk_framework
 {
+	class DynamicTensorPosIterator
+	{
+	private:
+		uvec3 current = uvec3(0);
+		uvec3 m_size;
+	public:
+		DynamicTensorPosIterator() = default;
+
+		DynamicTensorPosIterator(uvec3 current, uvec3 size) : current(current), m_size(size){}
+
+		bool operator!=(const DynamicTensorPosIterator& other)
+		{
+			return current.z != other.current.z;
+		}
+
+		uvec3 operator*()
+		{
+			return current;
+		}
+
+		DynamicTensorPosIterator& operator++()
+		{
+			current.x++;
+			if(current.x == m_size.x)
+			{
+				current.y++;
+				current.x = 0;
+			}
+			if(current.y == m_size.y)
+			{
+				current.z++;
+				current.y = 0;
+			}
+			assert(current.z != m_size.z + 1);
+			return *this;
+		}
+	};
+
 	template<uvec3 m_size> class TensorPosIterator
 	{
 	private:
@@ -114,7 +152,7 @@ namespace danikk_framework
 			return true;
 		}
 
-		uvec2 size() const
+		uvec3 size() const
 		{
 			return m_size;
 		}
