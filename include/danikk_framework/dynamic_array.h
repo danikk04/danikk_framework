@@ -128,7 +128,7 @@ namespace danikk_framework
 
 		bool operator!=(const DynamicArray<value_t>& other) const
         {
-            if(other.lenght() != m_size)
+            if(other.size() != m_size)
             {
                 return true;
             }
@@ -145,7 +145,7 @@ namespace danikk_framework
 
         bool operator==(const DynamicArray<value_t>& other) const
         {
-            if(other.lenght() != m_size)
+            if(other.size() != m_size)
             {
                 return false;
             }
@@ -451,7 +451,7 @@ namespace danikk_framework
 		//перемещает элемент element_ref из текущего массива в dest.
 		void moveTo(value_t& element_ref, type& dest)
 		{
-			dest.push_move(pull(element_ref));
+			dest.pushMove(pull(element_ref));
 		}
 
 		//Удаляет элемент по ссылке, которая указывает на элемент массива.

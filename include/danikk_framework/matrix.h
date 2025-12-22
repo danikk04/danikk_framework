@@ -109,6 +109,15 @@ namespace danikk_framework
 			return data[index.x + index.y * m_size.x];
 		}
 
+		value_t& at(uint32 x, uint32 y)
+		{
+			assert(data != NULL);
+			assert(x < m_size.x);
+			assert(y < m_size.y);
+
+			return data[x + y * m_size.x];
+		}
+
 		uvec2 size()
 		{
 			return m_size;

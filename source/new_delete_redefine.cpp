@@ -48,11 +48,11 @@ namespace danikk_framework
 	}
 }
 
-void* operator new (size_t size) {
+/*void* operator new (size_t size) {
     return danikk_framework::malloc(size);
 }
 
 void operator delete(void* ptr, size_t)
 {
 	free(ptr);
-}
+}*/
