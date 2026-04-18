@@ -1,6 +1,6 @@
 #pragma once
 
-#include <danikk_framework/string_buffer.h>
+#include <danikk_framework/static_string.h>
 #include <danikk_framework/string.h>
 #include <danikk_framework/filesystem.h>
 #include <danikk_framework/filestream.h>
@@ -51,7 +51,27 @@ namespace danikk_framework
 			return system(command_buffer.c_string());
 		}
 
-		template<class firstT,class... Types> int execr(String& result, firstT command, Types... args)
+		void execr(String& result, const char* cmd)
+		{
+			FILE* pipe = popen(cmd, "r");
+		   	if (pipe == NULL)
+		   	{
+		   		goto end;
+		   	}
+		   	result.clear();
+		    char buffer[128];
+		    while (!feof(pipe)) {
+		        if (fgets(buffer, 128, pipe) != NULL)
+		        {
+		        	result.append(buffer, 128);
+		        }
+		    }
+		    end:
+			pclose(pipe);
+		    return;
+		}
+
+		template<class firstT,class... Types> int exec_file_read(String& result, firstT command, Types... args)
 		{
 			using namespace internal;
 

@@ -3,7 +3,7 @@
 #include <danikk_framework/string.h>
 #include <danikk_framework/number.h>
 #include <danikk_framework/errno.h>
-#include <danikk_framework/string_buffer.h>
+#include <danikk_framework/static_string.h>
 #include <danikk_framework/path_buffer.h>
 #include <danikk_framework/exception.h>
 #include <filesystem>

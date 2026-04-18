@@ -14,6 +14,7 @@
 namespace danikk_framework
 {
 	extern thread_local const char* thread_label;
+	extern thread_local bool is_main_thread;
 
 	class Thread : private std::thread
 	{

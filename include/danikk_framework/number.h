@@ -1,7 +1,7 @@
 #pragma once
 
 #include <danikk_framework/number_base.h>
-#include <danikk_framework/string_buffer.h>
+#include "static_string.h"
 
 namespace danikk_framework
 {

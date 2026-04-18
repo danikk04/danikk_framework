@@ -1,8 +1,8 @@
 #pragma once
 
 #include <danikk_framework/danikk_framework.h>
-#include <danikk_framework/string_buffer.h>
-#include "cstring_functions.h"
+#include <danikk_framework/cstring_functions.h>
+#include <danikk_framework/static_string.h>
 
 namespace danikk_framework
 {

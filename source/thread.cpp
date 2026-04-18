@@ -186,4 +186,5 @@ namespace danikk_framework
 	}
 
 	thread_local const char* thread_label = "";
+	thread_local bool is_main_thread;
 }

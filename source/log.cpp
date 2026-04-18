@@ -2,7 +2,7 @@
 #include <danikk_framework/filesystem.h>
 #include <danikk_framework/datetime.h>
 #include <danikk_framework/localization.h>
-#include <danikk_framework/string_buffer.h>
+#include <danikk_framework/static_string.h>
 #include <danikk_framework/number.h>
 #include <danikk_framework/thread.h>
 #include <iostream>
@@ -121,12 +121,12 @@ namespace danikk_framework
 
 	namespace internal
 	{
-		const char* log_Debug 	= "DEBUG ";
-		const char* log_Info	= "INFO  ";
-		const char* log_Warning = "WARN  ";
-		const char* log_Error 	= "ERROR ";
-		const char* log_Fatal 	= "FATAL ";
-		const char* log_Trace 	= "TRACE ";
+		const char* log_Debug 	= "DEBUG";
+		const char* log_Info	= "INFO";
+		const char* log_Warning = "WARN";
+		const char* log_Error 	= "ERROR";
+		const char* log_Fatal 	= "FATAL";
+		const char* log_Trace 	= "TRACE";
 		const char* log_Memory 	= "MEMORY";
 		const char* log_Assert 	= "ASSERT";
 	}

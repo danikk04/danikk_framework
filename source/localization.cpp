@@ -1,6 +1,6 @@
 #include<danikk_framework/localization.h>
 #include<danikk_framework/memory.h>
-#include<danikk_framework/string_buffer.h>
+#include<danikk_framework/static_string.h>
 #include<danikk_framework/log.h>
 
 #include <locale.h>

@@ -206,6 +206,8 @@ namespace danikk_framework
 
         String& appendToStart(const String& str);
 
+        String& append(const char* data, size_t size);
+
         String& operator <<(const String& other);
     };
 }

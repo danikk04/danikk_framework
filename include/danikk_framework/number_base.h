@@ -2,12 +2,12 @@
 
 #include <danikk_framework/danikk_framework.h>
 #include <danikk_framework/string.h>
-#include <danikk_framework/string_buffer.h>
 #include <danikk_framework/type_traits.h>
 #include <danikk_framework/assert.h>
 #include <cstdlib>
 #include <concepts>
 #include <type_traits>
+#include "static_string.h"
 
 namespace danikk_framework
 {

@@ -5,9 +5,9 @@
 #include <danikk_framework/string.h>
 #include <danikk_framework/format.h>
 #include <danikk_framework/memory.h>
-#include <danikk_framework/string_buffer.h>
 #include <gumbo.h>
 
+#include "../static_string.h"
 #include "array.h"
 #include "cstring_functions.h"
 #include "memory_buffer.h"

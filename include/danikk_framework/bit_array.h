@@ -52,4 +52,33 @@ namespace danikk_framework
 			return BitArrayPointer(m_data[byte_index], bit_index);
 		}
 	};
+
+	class BitArray32
+	{
+		uint32 m_data;
+
+	public:
+		BitArray32() = default;
+
+		BitArray32(uint32 value) : m_data(value){}
+
+		void set(uint32 index, bool value)
+		{
+			uint32 unite_value = (uint32)1 << index;
+			if(value)
+			{
+				m_data |= unite_value;
+			}
+			else
+			{
+				m_data &= ~unite_value;
+			}
+		}
+
+		bool get(uint32 index)
+		{
+			uint32 unite_value = (uint32)1 << index;
+			return m_data & unite_value;
+		}
+	};
 }

@@ -5,6 +5,7 @@
 #include <danikk_framework/log.h>
 #include <danikk_framework/glm.h>
 #include <danikk_framework/assert.h>
+#include <danikk_framework/cstring_functions.h>
 
 namespace danikk_framework
 {
@@ -216,6 +217,56 @@ namespace danikk_framework
 		void move(uint32 x, uint32 y)
 		{
 			m_start = uvec2(x, y);
+		}
+	};
+
+	//Матрица, которая работает со строкой (например из CSV) и позволяет получить к ней доступ.
+	//В качестве индекса используется uint16. 65 535 - максимальное количество ячеек.
+	class StringMatrix16
+	{
+		char* data;
+		uint16* indices;
+		uvec2 m_size = uvec2(1,1);
+
+		public:
+		//парсит csv
+		//возвращает текст ошибки
+		const char* parseInlineCSV(char* data, size_t data_size, char column_splitter = ',', char row_splitter = '\n')
+		{
+			uint cell_count = 1;
+			uint last_column_count = 0;
+			uint column_count = 1;
+			uint row_count = 1;
+			for(index_t i = 0; i < data_size; i++)
+			{
+				char chr = data[i];
+				if(chr == row_splitter)
+				{
+					row_count++;
+					cell_count++;
+
+					if(last_column_count != 0)
+					{
+						if(last_column_count != column_count)
+						{
+
+						}
+						last_column_count = column_count;
+					}
+					last_column_count = column_count;
+				}
+				else if(chr == column_splitter)
+				{
+					column_count++;
+					cell_count++;
+				}
+			}
+			if (cell_count >= 65535)
+			{
+				return "StringMatrix16::parseInlineCSV cell_count >= 65535";
+			}
+			indices = (uint16*)malloc(cell_count * sizeof(uint16));
+			return NULL;
 		}
 	};
 

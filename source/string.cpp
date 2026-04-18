@@ -876,6 +876,13 @@ namespace danikk_framework
     	return *this;
     }
 
+    String& String::append(const char* data, size_t size)
+    {
+    	resize(this->size() + size);
+    	memcpy(end() - size, data, size);
+    	return *this;
+    }
+
     String& String::operator <<(const String& other)
     {
     	reserve(other.size());
