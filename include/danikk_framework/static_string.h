@@ -11,42 +11,41 @@
 
 namespace danikk_framework
 {
-	template<size_t _capacity> class StringBuffer
+	template<size_t _capacity> class StaticString
 	{
 	private:
 		char m_data[_capacity];
-		char* m_end;
+		size_t m_size = 0;
 
 		void write(const char* data, size_t size)
 		{
-			memcpy(m_end, data, size);
-			m_end += size;
+			memcpy(end(), data, size);
+			m_size += size;
 		}
 	public:
-		StringBuffer()
+		StaticString()
 		{
-			m_end = m_data;
 		}
 
-		StringBuffer(StringBuffer& other)
-		{
-			memcpy(m_data, other.m_data, other.size());
-			m_end = other.m_end;
-		}
-
-		StringBuffer(StringBuffer&& other)
+		StaticString(StaticString& other)
 		{
 			memcpy(m_data, other.m_data, other.size());
-			m_end = other.m_end;
+			m_size = other.m_size;
 		}
 
-		StringBuffer& operator=(StringBuffer& other)
+		StaticString(StaticString&& other)
 		{
 			memcpy(m_data, other.m_data, other.size());
-			m_end = other.m_end;
+			m_size = other.m_size;
 		}
 
-		template<class str_t> StringBuffer(const str_t& data)
+		StaticString& operator=(StaticString& other)
+		{
+			memcpy(m_data, other.m_data, other.size());
+			m_size = other.m_size;
+		}
+
+		template<class str_t> StaticString(const str_t& data)
 		{
 			if constexpr(is_cstring<str_t>::value)
 			{
@@ -57,8 +56,8 @@ namespace danikk_framework
 					*push_ptr = *ptr;
 					push_ptr++;
 					ptr++;
+					m_size++;
 				}
-				m_end = push_ptr;
 			}
 			else
 			{
@@ -68,13 +67,13 @@ namespace danikk_framework
 					throw "[danikk_framework::StringBuffer] capacity < data_size";
 				}
 				memcpy(m_data, data.data(), data_size);
-				m_end = m_data + data_size;
+				m_size = data_size;
 			}
 		}
 
-		template<class str_t> StringBuffer& operator =(const str_t& data)
+		template<class str_t> StaticString& operator =(const str_t& data)
 		{
-			new (this) StringBuffer<_capacity>(data);
+			new (this) StaticString<_capacity>(data);
 			return *this;
 		}
 
@@ -93,22 +92,22 @@ namespace danikk_framework
 			return sizeWillFit(data.size());
 		}
 
-		StringBuffer& operator << (char data)
+		StaticString& operator << (char data)
 		{
-			*m_end = data;
-			m_end++;
+			*end() = data;
+			m_size++;
 			return *this;
 		}
 
-		StringBuffer& operator << (const char* data)
+		StaticString& operator << (const char* data)
 		{
 			int len = strlen(data);
-			memcpy(m_end, data, len);
-			m_end += len;
+			memcpy(end(), data, len);
+			m_size += len;
 			return *this;
 		}
 
-		StringBuffer& operator << (unsigned long int num)
+		StaticString& operator << (unsigned long int num)
 		{
 			char buffer[64];
 			snprintf(buffer, 64, "%lu", num);
@@ -116,27 +115,27 @@ namespace danikk_framework
 			return *this;
 		}
 
-		StringBuffer& operator << (const String& str)
+		StaticString& operator << (const String& str)
 		{
-			memcpy((void*)m_end, (const void*)str.data(), str.size());
-			m_end += str.size();
+			memcpy((void*)end(), (const void*)str.data(), str.size());
+			m_size += str.size();
 			return *this;
 		}
 
 		void resize(size_t n_size)
 		{
-			m_end = (char*)m_data + n_size;
+			m_size = n_size;
 		}
 
 		const char* c_string()
 		{
-			*m_end = '\0';
+			*end() = '\0';
 			return m_data;
 		}
 
 		const char* c_string() const
 		{
-			*m_end = '\0';
+			*end() = '\0';
 			return m_data;
 		}
 
@@ -150,9 +149,19 @@ namespace danikk_framework
 			return m_data;
 		}
 
+		char* end()
+		{
+			return data() + m_size;
+		}
+
+		const char* end() const
+		{
+			return data() + m_size;
+		}
+
 		void clear()
 		{
-			m_end = m_data;
+			m_size = 0;
 		}
 
 		char& operator [](size_t index)
@@ -167,17 +176,7 @@ namespace danikk_framework
 
 		size_t size() const
 		{
-			return (size_t)m_end - (size_t)m_data;
-		}
-
-		char* end()
-		{
-			return m_end;
-		}
-
-		const char* end() const
-		{
-			return m_end;
+			return (size_t)m_size;
 		}
 
 		char firstChar()
@@ -185,13 +184,13 @@ namespace danikk_framework
 			return *m_data;
 		}
 
-		char endChar()
+		char lastChar()
 		{
-			return  *(m_end - 1);
+			return *(end() - 1);
 		}
 	};
 
-	template<class stream_t, size_t string_buffer_size> stream_t& operator <<(stream_t& stream,const StringBuffer<string_buffer_size>& data)
+	template<class stream_t, size_t string_buffer_size> stream_t& operator <<(stream_t& stream,const StaticString<string_buffer_size>& data)
 	{
 		const char* current = data.data();
 		const char* endptr = data.end();

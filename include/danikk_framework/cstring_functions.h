@@ -8,6 +8,7 @@
 namespace danikk_framework
 {
 	typedef size_t unicode_char;
+	typedef char* CString;
 
 	template<class T> struct is_cstring
 	{

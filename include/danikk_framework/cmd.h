@@ -36,6 +36,16 @@ namespace danikk_framework
 
 	namespace cmd
 	{
+		template<class command_t> int exec(const command_t& command)
+		{
+			if constexpr(IS_DEBUG)
+			{
+				formatLogDebug("% : %", localization("exec_cmd"), command);
+			}
+
+			return system(command.c_string());
+		}
+
 		template<class firstT,class... Types> int exec(firstT command,Types... args)
 		{
 			using namespace internal;
@@ -51,7 +61,7 @@ namespace danikk_framework
 			return system(command_buffer.c_string());
 		}
 
-		void execr(String& result, const char* cmd)
+		inline void execr(String& result, const char* cmd)
 		{
 			FILE* pipe = popen(cmd, "r");
 		   	if (pipe == NULL)
@@ -66,8 +76,8 @@ namespace danikk_framework
 		        	result.append(buffer, 128);
 		        }
 		    }
-		    end:
 			pclose(pipe);
+		    end:
 		    return;
 		}
 

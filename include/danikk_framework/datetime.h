@@ -6,7 +6,7 @@
 
 namespace danikk_framework
 {
-	typedef StringBuffer<24> DateTimeString;
+	typedef StaticString<24> DateTimeString;
 
 	struct DateTime
 	{
@@ -30,6 +30,13 @@ namespace danikk_framework
 		DateTimeString getDateString(char date_separator = '-') const;
 
 		static DateTime local();
+	};
+
+	struct Date
+	{
+		uint16 year;
+		uint8 month;
+		uint8 day;
 	};
 
 	bool operator <(const DateTime& first, const DateTime& second);

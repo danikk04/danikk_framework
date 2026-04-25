@@ -7,10 +7,9 @@
 #include <danikk_framework/memory.h>
 #include <gumbo.h>
 
-#include "../static_string.h"
-#include "array.h"
-#include "cstring_functions.h"
-#include "memory_buffer.h"
+#include <danikk_framework/static_string.h>
+#include <danikk_framework/cstring_functions.h>
+#include <danikk_framework/memory_buffer.h>
 
 namespace danikk_framework
 {
@@ -49,7 +48,7 @@ namespace danikk_framework
 					}
 				}
 
-				cout << endl;
+				cout << '\n';
 
 
 				GumboVector& childs = node->v.element.children;
@@ -86,7 +85,7 @@ namespace danikk_framework
 				{
 					cout << "empty";
 				}
-				cout << endl;
+				cout << '\n';
 			}
 			else
 			{

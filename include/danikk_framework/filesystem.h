@@ -53,6 +53,41 @@ namespace danikk_framework
 		}
 	}
 
+	template<class pathT> void readFileAsString(const pathT& path, String& output, String& characters_to_ignore)
+	{
+        FileReader reader;
+        reader.open(path);
+
+		uint fileSize = reader.size();
+		output.clear();
+		output.reserve(fileSize / 2);
+		size_t file_remains = fileSize;
+		StaticString<kib(4)> buffer;
+		buffer.resize(buffer.capacity());
+
+		while(file_remains > 0)
+		{
+			if(file_remains >= buffer.capacity())
+			{
+				reader.read(buffer.data(), buffer.capacity());
+				file_remains -= buffer.capacity();
+			}
+			else
+			{
+				reader.read(buffer.data(), file_remains);
+				file_remains = 0;
+			}
+			for(char chr : buffer)
+			{
+				if(!characters_to_ignore.contains(chr))
+				{
+					output << chr;
+				}
+			}
+		}
+		reader.close();
+	}
+
 	template<class pathT> bool exitsFile(pathT& path)
 	{
 		int result = ::access(tocstring(path), F_OK);

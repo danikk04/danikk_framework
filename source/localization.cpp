@@ -20,7 +20,7 @@ namespace danikk_framework
 
 	void Localization::parsekvlist(const char* str)
 	{
-		StringBuffer<64> keyBuffer;
+		StaticString<64> keyBuffer;
 		String valueBuffer;
 
 		bool is_value_reading = true;

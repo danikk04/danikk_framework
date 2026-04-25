@@ -12,18 +12,6 @@ namespace danikk_framework
 
 	const char* boolToNumberString(bool value);
 
-	/*String hex(cref<String> data);
-
-	String unhex(cref<String> data);*/
-
-	//String toCodeList(cref<String> data);
-
-	//String unCodeList(cref<String> data);
-
-	//void toCodeList(ref<String> data);
-
-	//void unCodeList(ref<String> data);
-
     class Utf8Iterator
     {
     private:
@@ -201,6 +189,8 @@ namespace danikk_framework
         String& cutBeforeLastSeparator(char separator);
 
         String& cutSideChars(char chr);
+
+        String& eraseCharacters(const String& targets);
 
         String& replace(const String& sub, const String& result);
 

@@ -9,7 +9,7 @@ subdir('source')
 
 include = [include_directories('include'), include_directories('include_lib')]
 
-add_project_arguments('-O3', language : 'cpp')
+#add_project_arguments('-O3', language : 'cpp')
 
 cpp_args = [
 	'-Wvla',

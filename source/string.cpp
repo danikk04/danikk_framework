@@ -633,7 +633,7 @@ namespace danikk_framework
     {
     	if(new_size > m_size)
     	{
-    		reserve(new_size + 1);
+    		reserve(new_size - m_size);
     	}
 		m_size = new_size;
     }
@@ -771,6 +771,26 @@ namespace danikk_framework
 		return *this;
     }
 
+    String& String::eraseCharacters(const String& targets)
+    {
+		char* currentWritePtr = m_data;
+		char* currentReadPtr = m_data;
+		char* endPtr = end();
+
+		while(currentReadPtr != endPtr)
+		{
+			char chr = *currentReadPtr;
+			if(!targets.contains(chr))
+			{
+				*currentWritePtr = *currentReadPtr;
+				currentWritePtr++;
+			}
+			currentReadPtr++;
+		}
+	    m_size = currentWritePtr - m_data;
+		return *this;
+    }
+
     String& String::replace(const String& sub, const String& result)
     {
     	size_t resultSize = result.size();
@@ -794,7 +814,7 @@ namespace danikk_framework
     			}
     			else
     			{
-    				*currentWritePtr = *currentReadPtr;
+    				*currentWritePtr = *currentReadPtr;//ХЗ
     				currentWritePtr++;
     				currentReadPtr++;
     			}
@@ -886,13 +906,8 @@ namespace danikk_framework
     String& String::operator <<(const String& other)
     {
     	reserve(other.size());
-    	for(char chr : other)
-    	{
-    		m_data[m_size++] = chr;
-    	}
-    	/*char* write_ptr = end();
+    	memcpy(end(), other.data(), other.size());
     	resize(size() + other.size());
-    	memcpy(write_ptr, other.data(), other.size());*///ПОЧЕМУТО НЕ РАБОТАЕТ
     	return *this;
     }
 }

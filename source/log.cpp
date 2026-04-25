@@ -55,11 +55,11 @@ namespace danikk_framework
 		else if(log_config.use_application_time)
 		{
 			uint64 elapsed_time = getSystemTimeInMilliseconds() - start_time;
-			StringBuffer<32> elapsed_buffer;
+			StaticString<32> elapsed_buffer;
 			elapsed_buffer.resize(writeNumberToStringBuffer(elapsed_time, elapsed_buffer.data(), elapsed_buffer.capacity()));
 
 			log_buffer << n_chars(' ',12 - std::max(elapsed_buffer.size(), (size_t)4));
-			StringBuffer<32> num_buffer;
+			StaticString<32> num_buffer;
 			num_buffer << n_chars('0', elapsed_buffer.size() > 4 ? 0 : 4 - elapsed_buffer.size()) << elapsed_buffer;
 
 			for(index_t i = 0; i < num_buffer.size(); i++)
@@ -79,11 +79,11 @@ namespace danikk_framework
 		#define LOG_IF_TO(LOG, EXPR) if(EXPR) LOG << log_buffer;
 		if(log_config.log_to_clog)
 		{
-			std::clog << log_buffer.c_string();
+			std::clog.write(log_buffer.data(), log_buffer.size());
 		}
 		if(log_config.log_to_cout)
 		{
-			std::cout << log_buffer.c_string();
+			std::cout.write(log_buffer.data(), log_buffer.size());
 		}
 		if(log_config.log_to_file)
 		{

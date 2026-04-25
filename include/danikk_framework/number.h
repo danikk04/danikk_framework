@@ -5,7 +5,7 @@
 
 namespace danikk_framework
 {
-	template<class numberT> size_t writeNumberToStringBuffer(numberT number, char* buffer, size_t bufferSize)
+	template<class numberT> size_t writeNumberToStringBuffer(numberT number, char* buffer, size_t bufferSize, size_t num_after_point=2)
 	{
 		size_t len;
 
@@ -20,7 +20,10 @@ namespace danikk_framework
 		}
 		else if constexpr(std::is_same<numberT, float>::value)
 		{
-			len = printToBuffer("%.2f", float);
+			char format_template[8]{"%.2f"};
+			format_template[2] = '0' + num_after_point;
+			assert(num_after_point < 10);
+			len = printToBuffer(format_template, float);
 		}
 		else if constexpr(std::is_same<numberT, double>::value)
 		{
@@ -32,6 +35,11 @@ namespace danikk_framework
 		}
 #undef snprintf
 		return len;
+	}
+
+	template<class number_t, class buffer_t> size_t writeNumberToStringBuffer(number_t number, buffer_t& buffer, size_t num_after_point=2)
+	{
+		return writeNumberToStringBuffer(number, buffer.data(), buffer.capacity(), num_after_point);
 	}
 
 	template<class numberT> String numberToString(numberT number)
@@ -73,7 +81,7 @@ namespace danikk_framework
 
 	template<class numberT> numberT readNumber(const char* str)
 	{
-		StringBuffer<64> numbuffer;
+		StaticString<64> numbuffer;
 		while(true)
 		{
 			char chr = *str;
