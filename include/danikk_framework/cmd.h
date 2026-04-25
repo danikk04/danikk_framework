@@ -73,7 +73,7 @@ namespace danikk_framework
 		    while (!feof(pipe)) {
 		        if (fgets(buffer, 128, pipe) != NULL)
 		        {
-		        	result.append(buffer, 128);
+		        	result.append((const char*)buffer, 128);
 		        }
 		    }
 			pclose(pipe);

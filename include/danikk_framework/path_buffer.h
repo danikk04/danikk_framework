@@ -80,9 +80,9 @@ namespace danikk_framework
 
         char& operator[](size_t index);
 
-		char firstChar() const;
+		char first() const;
 
-		char lastChar() const;
+		char last() const;
 
 	    friend const PathBuffer& getcwd();
 
@@ -103,7 +103,7 @@ namespace danikk_framework
     	{
     		const char* namePtr = name;
 
-    		if(*namePtr == pathSlash && lastChar() == pathSlash)
+    		if(*namePtr == pathSlash && last() == pathSlash)
     		{
         		*this << (namePtr + 1);
     		}
@@ -125,10 +125,10 @@ namespace danikk_framework
     	}
     	else
     	{
-    		if(name.firstChar() == pathSlash && lastChar() == pathSlash)
+    		if(name.first() == pathSlash && last() == pathSlash)
     		{
 				push(name.data() + 1, name.size() - 1);
-    			if(name.lastChar() != pathSlash)
+    			if(name.last() != pathSlash)
         		{
     				*this << pathSlash;
         		}
@@ -137,7 +137,7 @@ namespace danikk_framework
     		{
     			push(name.data(), name.size());
 
-    			if(name.lastChar() != pathSlash)
+    			if(name.last() != pathSlash)
         		{
         			*this << pathSlash;
         		}

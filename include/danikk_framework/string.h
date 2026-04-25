@@ -4,46 +4,18 @@
 #include <type_traits>
 
 #include <danikk_framework/danikk_framework.h>
+#include <danikk_framework/internal/generic_string.h>
 #include "cstring_functions.h"
 
 namespace danikk_framework
 {
-	bool stringToBool(const String& str);
-
-	const char* boolToNumberString(bool value);
-
-    class Utf8Iterator
-    {
-    private:
-        char* charPtr;
-        size_t octetSize;
-    public:
-        Utf8Iterator(char* ptr);
-
-        bool operator!=(const Utf8Iterator& other) const;
-
-        bool operator==(const Utf8Iterator& other) const;
-
-        size_t operator-(const Utf8Iterator& other) const;
-
-        operator char*();
-
-        operator void*();
-
-        void operator++();
-
-        const Utf8Iterator operator++(int);
-
-        unicode_char operator*() const;
-    };
-
-    class String
+    class String : public GenericString
     {
     	friend class MemoryBuffer;
     private:
-        mutable char* m_data;//В c_string нужно ставить нуль терминатор в конец строки.
-        mutable size_t m_size;
-        mutable size_t m_capacity;
+        char* m_data;//В c_string нужно ставить нуль терминатор в конец строки.
+        size_t m_size;
+        size_t m_capacity;
 
         void pushMemory(const char* memory, size_t size);
     public:
@@ -71,6 +43,16 @@ namespace danikk_framework
 
 		String(size_t size, char initChar);
 
+		String& operator=(const String&) = default;
+
+		String& operator=(String&& other)
+		{
+			void* other_mem = (void*)&(String&)other;
+			memcpy((void*)this, other_mem, sizeof(String));
+			memset(other_mem, 0, sizeof(String));
+			return *this;
+		}
+
 		~String();
 
 	    operator const std::string&() const
@@ -78,126 +60,72 @@ namespace danikk_framework
 	    	return *((const std::string*)this);
 		}
 
-		String copy() const;
-
-		void copyData(const String& source);
-
-		void copyData(const char* source);
-
-		void copyData(const char* source, size_t sourceSize);
-
-		void copyData(const char* source, const char* endptr);
-
-	    bool operator !=(const String& other) const;
-
-	    bool operator ==(const String& other) const;
-
-	    bool operator ==(const char* other) const;
-
-	    bool operator >(const String& other) const;
-
-	    bool operator <(const String& other) const;
-
 	    operator bool() const;
 
-	    char& operator[](size_t index) const;
+		const char* data() const
+		{
+			return m_data;
+		}
 
-	    String& operator =(const String& other);
+		const char* begin() const
+		{
+			return m_data;
+		}
 
-	    String& operator =(const char* str);
+		const char* end() const
+		{
+			return m_data + m_size;
+		}
 
-	    String& operator =(String&& other);
+		char* data()
+		{
+			return m_data;
+		}
 
-	    String& operator <<(char value);
+		char* begin()
+		{
+			return m_data;
+		}
 
-	    String& operator <<(uint64 value);
+		char* end()
+		{
+			return m_data + m_size;
+		}
 
-	    String& operator <<(float value);
+		size_t size() const
+		{
+			return m_size;
+		}
 
-		size_t size() const;
+		size_t capacity() const
+		{
+			return m_capacity;
+		}
 
-	    const char* data() const;
+		void resize(size_t new_size)
+		{
+			reserve(m_size + new_size);
+			m_size = new_size;
+		}
 
-		char* data();
+		void addsize(size_t add_size)
+		{
+			reserve(add_size);
+			m_size += add_size;
+		}
 
-		const char* begin() const;
+		void substractsize(size_t minus_size)
+		{
+			m_size -= minus_size;
+		}
 
-		char* begin();
+		const char* c_string() const
+		{
+			const_cast<String*>(this)->reserve(1);
+	        m_data[size()] = '\0';
+	        return data();
+		}
 
-		const char* end() const;
-
-		char* end();
-
-		char* c_string();
-
-		const char* c_string() const;
-
-        char* find(char character);
-
-        const char* find(char character) const;
-
-        char* findLast(char character);
-
-        const char* findLast(char character) const;
-
-		int indexOf(char chr) const;
-
-        void clear();
-
-		void reserve(size_t count) const;
-
-		void push(const char* data, size_t dataSize);
-
-		void push(const String& otherString);
-
-        void push(char character);
-
-        void resize(size_t count);
-
-        void nullifyMemory();
-
-        char firstChar() const;
-
-        char lastChar() const;
-
-        bool haveEqualChar(const String& otherString) const;
-
-        bool haveOnlyEqualChars(const String& otherString) const;
-
-        bool empty() const;
-
-		void split(const char* splitPlace, String& output1, String& output2) const;
-
-        bool contains(char character) const;
-
-        bool startsWith(const char* str) const;
-
-        void splitToFirstSeparator(char separator, String& output1, String& output2) const;
-
-        void splitToLastSeparator(char separator, String& output1, String& output2) const;
-
-        String& cutChars(char chr);
-
-        String& substring(const char* begin, const char* end);
-
-        String& cutAfterSeparator(char separator);
-
-        String& cutBeforeSeparator(char separator);
-
-        String& cutAfterLastSeparator(char separator);
-
-        String& cutBeforeLastSeparator(char separator);
-
-        String& cutSideChars(char chr);
-
-        String& eraseCharacters(const String& targets);
-
-        String& replace(const String& sub, const String& result);
-
-        String& appendToStart(const String& str);
-
-        String& append(const char* data, size_t size);
-
-        String& operator <<(const String& other);
+		void reserve(size_t count);
     };
 }

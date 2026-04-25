@@ -250,12 +250,12 @@ namespace danikk_framework
     	return m_data[index];
     }
 
-	char PathBuffer::firstChar() const
+	char PathBuffer::first() const
 	{
 		return *m_data;
 	}
 
-	char PathBuffer::lastChar() const
+	char PathBuffer::last() const
 	{
 		return m_data[size() - 1];
 	}
@@ -274,7 +274,7 @@ namespace danikk_framework
             #if IS_LINUX
                 String desktopPath;
                 cmd::execr(desktopPath, "xdg-user-dir DESKTOP");
-                while(desktopPath.lastChar() != '\n')
+                while(desktopPath.last() != '\n')
                 {
                 	desktopPath.resize(desktopPath.size() - 1);
                 }

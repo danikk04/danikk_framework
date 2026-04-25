@@ -74,7 +74,7 @@ namespace danikk_framework
 	bool LineFileReader::read(String& str)
 	{
 		str.clear();
-		while(str.size() == 0 || str.lastChar() != '\n')
+		while(str.size() == 0 || str.last() != '\n')
 		{
 			if(buffer_offset == buffer.capacity())
 			{
