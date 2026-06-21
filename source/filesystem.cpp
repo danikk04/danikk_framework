@@ -100,8 +100,8 @@ namespace danikk_framework
 
 	const char* getExtensionFromPath(const char* path)
 	{
-		const char* lastPathSlashPtr = strfindlast(path, pathSlash);
-		const char* lastPointPtr = strfindlast(lastPathSlashPtr, '.');//Что-бы не итерироваться по path второй раз можно просто искать точку в lastPathSlashPtr.
+		const char* lastPathSlashPtr = strrchr(path, pathSlash);
+		const char* lastPointPtr = strrchr(lastPathSlashPtr, '.');//Что-бы не итерироваться по path второй раз можно просто искать точку в lastPathSlashPtr.
 
 		if(lastPointPtr == NULL)
 		{

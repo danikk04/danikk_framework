@@ -266,6 +266,7 @@ namespace danikk_framework
     	reserve(data_size);
 		memcpy(end(), data_ptr, data_size);
 		addsize(data_size);
+		return *this;
     }
 
 	GenericString& GenericString::operator =(const GenericString& other)
@@ -280,11 +281,6 @@ namespace danikk_framework
 		this->clear();
 		*this << str;
 		return *this;
-	}
-
-	GenericString& GenericString::operator =(GenericString&& other)
-	{
-
 	}
 
 	GenericString& GenericString::operator <<(float value)

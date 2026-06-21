@@ -16,7 +16,7 @@ namespace danikk_framework
 			void allocate(size_t size)
 			{
 				this->size = size;
-				m_data = malloc(size);
+				m_data = (byte*)malloc(size);
 			}
 
 			bool isNull()
@@ -82,6 +82,37 @@ namespace danikk_framework
 				size++;
 			}
 		} string_data;
+
+		struct Iterator
+		{
+		private:
+			string_index_t* ptr;
+			MonolithCStringArray* array;
+		public:
+			Iterator(string_index_t* ptr, MonolithCStringArray* array)
+				: ptr(ptr), array(array) {}
+
+			bool operator!=(const Iterator& other) const
+			{
+				return this->ptr != other.ptr;
+			}
+
+			bool operator==(const Iterator& other) const
+			{
+				return this->ptr == other.ptr;
+			}
+
+			char* operator*()
+			{
+				return array->string_data.data() + *ptr;
+			}
+
+			Iterator& operator++()
+			{
+			    ++ptr;
+			    return *this;
+			}
+		};
 	public:
 		void allocate(uint32 string_capacity, uint32 char_capacity)
 		{

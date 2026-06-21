@@ -5,60 +5,34 @@
 #include <danikk_framework/cstring_functions.h>
 #include <danikk_framework/localization.h>
 #include <danikk_framework/log.h>
+#include <danikk_framework/cstring_iterator.h>
 
 namespace danikk_framework
 {
-	void openData(const char* data, size_t size);
-
-	void Config::openData(const String& data)
+	void Config::openData(String& data)
 	{
-		openData(data.data(), data.size());
+		openData(data.c_string());
 	}
 
-	void Config::openData(const char* data, size_t size)
+	void Config::openData(const char* str)
 	{
-		const char* curstr = data;
-		const char* end = data + size;
 		String key;
 		String value;
-		bool is_key_parsing = true;
+		const char* end = strchr(str, '\0');
 		while(true)
 		{
-			while(*curstr == '#' || (is_key_parsing && *curstr == '\n'))
+			char* key = str;
+			str = strchr(str, '=') + 1;
+			char* value = str;
+			str = strchr(str, '\n');
+			str = str ? str + 1 : end;
+
+			m_data.insert(key, value);
+
+			if(curstr >= end)
 			{
-				curstr = strskiptochar(curstr, '\n');
-				curstr++;
+				break;
 			}
-			if(is_key_parsing)
-			{
-				if(*curstr == '=')
-				{
-					is_key_parsing = false;
-				}
-				else
-				{
-					key << *curstr;
-				}
-			}
-			else
-			{
-				if(*curstr == '\n' || curstr >= end)
-				{
-					is_key_parsing = true;
-					m_data.insert(key, value);
-					key.clear();
-					value.clear();
-					if(curstr >= end)
-					{
-						break;
-					}
-				}
-				else
-				{
-					value << *curstr;
-				}
-			}
-			curstr++;
 		}
 		m_opened = true;
 	}

@@ -33,5 +33,10 @@ namespace danikk_framework
 		{
 			m_array[m_size++] = key_value_pair{key, value};
 		}
+
+		void addPair(const char* key, const char* value)
+		{
+			m_array[m_size++] = key_value_pair{key - m_data, value - m_data};
+		}
 	};
 }

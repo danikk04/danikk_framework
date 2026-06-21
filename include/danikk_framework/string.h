@@ -16,8 +16,6 @@ namespace danikk_framework
         char* m_data;//В c_string нужно ставить нуль терминатор в конец строки.
         size_t m_size;
         size_t m_capacity;
-
-        void pushMemory(const char* memory, size_t size);
     public:
         String();
 

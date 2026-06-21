@@ -54,26 +54,17 @@ namespace danikk_framework
 
 		GenericString& operator << (const char* data)
 		{
-			int len = strlen(data);
-			reserve(len);
-			memcpy(end(), data, len);
-			addsize(len);
-			return *this;
+			return append(data, strlen(data));
 		}
 
 		GenericString& operator << (const GenericString& str)
 		{
-			reserve(str.size());
-			memcpy((void*)end(), (const void*)str.data(), str.size());
-			addsize(str.size());
-			return *this;
+			return append(str.data(), str.size());
 		}
 
 	    GenericString& operator =(const char* str);
 
     	GenericString& operator=(const GenericString& other);
-
-    	GenericString& operator=(GenericString&& other);
 
     	GenericString& operator <<(float value);
 

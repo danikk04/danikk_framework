@@ -1,8 +1,7 @@
 #pragma once
 
 #include <danikk_framework/danikk_framework.h>
-#include <danikk_framework/cataloged_dictionary.h>
-#include <danikk_framework/dictionary.h>
+#include <danikk_framework/string_dictionary.h>
 #include <danikk_framework/cstring_functions.h>
 #include <danikk_framework/number.h>
 #include <danikk_framework/localization.h>
@@ -10,10 +9,10 @@
 
 namespace danikk_framework
 {
-	class Config
+	template<uint32, > class StaticConfig
 	{
 	private:
-		StringDictionary<String> m_data;
+		StaticInlineStringDictionary<String> m_data;
 		uint m_opened = 0;
 	public:
 		Config() = default;
@@ -22,7 +21,7 @@ namespace danikk_framework
 
 		void openData(const String& data);
 
-		void openData(const char* data, size_t size);
+		void openData(char* data);
 
 		template<class key_t, class value_t> void set(const key_t& key, const value_t& value)
 		{

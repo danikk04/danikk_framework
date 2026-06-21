@@ -81,10 +81,6 @@ namespace danikk_framework
 
 	bool strempty(const char* str);
 
-	bool strcontains(const char* str, char chr1);
-
-	bool strcontains(const char* str, char chr1, char chr2);
-
 	//Проверка строк на одинаковость.
 	bool strequal(const char* str1, const char* str2);
 
@@ -100,29 +96,15 @@ namespace danikk_framework
 	//str move if starts with
 	bool strmifsw(const char*& str1, const char* str2);
 
-
 	//Если str1 начинается с str2, то возвращает true.
 	template<class str2T> bool strstartswith(const char* str1, const str2T& str2)
 	{
-		const char* str2Ptr = str2.data();
-		const char* endPtr = str2.end();
-
-		while(true)
-		{
-			if(str2Ptr == endPtr)
-			{
-				return true;
-			}
-			char chr1 = *str1++;
-			if(chr1 == '\0')
-			{
-				return false;
-			}
-			if(chr1 != *str2Ptr++)
-			{
-				return false;
-			}
-		}
+		return strncmp(str1, str2.data(), str2.size());
+	}
+	//Если str1 начинается с str2, то возвращает true.
+	template<class str2T> bool strstartswith(const char* str1,const char* str2)
+	{
+		return strncmp(str1, str2, strlen(str2));
 	}
 
 	//Строка состоит только из заданных символов
@@ -134,12 +116,6 @@ namespace danikk_framework
 	//Вырезает заданный символ из строки.
 	//Возвращает длинну новой строки.
 	size_t strcut(char* string, char character);
-
-	//string safe copy
-	//В 3-м аргументе указывается размер буффера назначения.
-	//Возвращает количество копированных символов.
-	//Если оно меньше dest_size, то буффер dest слишком мал.
-	size_t strscpy(char* dest, const char* source, size_t dest_size);
 
 	template<size_t dest_buffer_size, size_t splitter_chars_count> void
 		strsplit(char* string, Array<char*, dest_buffer_size>& dest_buffer, Array<char, splitter_chars_count>& splitters)
@@ -160,93 +136,6 @@ namespace danikk_framework
 
 	        string++;
 	    }
-	}
-
-	inline void strreplacefirst8(char* string, char from, char to)
-	{
-		for(index_t i = 0; i < 8; i++)
-		{
-			if(string[i] == from)
-			{
-				string[i] = to;
-			}
-		}
-	}
-
-	//Пропускает текст, пока текущий символ совпадает с одним из заданных.
-	CSTRING_TEMPLATE strskipchars(cstringT str, const char chr1, const char chr2)
-	{
-		while(true)
-		{
-			char curchr = *str;
-			if(curchr != chr1 && curchr != chr2)
-			{
-				return str;
-			}
-			str++;
-		}
-	}
-
-	CSTRING_TEMPLATE strskipchars(cstringT str, char chr1, char chr2, char chr3)
-	{
-		for(char currentChar; (currentChar = *str); str++)
-		{
-			if(currentChar != chr1 && currentChar != chr2 && currentChar != chr3)
-			{
-				return str;
-			}
-		}
-		return str;
-	}
-
-	//Пропускает до заданного символа.
-	CSTRING_TEMPLATE strskiptochar(cstringT str,  char chr)
-	{
-		while(*str != chr)
-		{
-			++str;
-		}
-		return str;
-	}
-
-	//Пропускает текст, пока не текущий символ не будет равен одному из заданных.
-	CSTRING_TEMPLATE strskiptochar(cstringT str, const char chr1, const char chr2)
-	{
-		for(char currentChar; (currentChar = *str) && currentChar != chr1 && currentChar != chr2; str++){}
-		return str;
-	}
-
-	//Находит последний символ, которые совпадает с указанным.
-	CSTRING_TEMPLATE strfindlast(cstringT str, char character)
-	{
-		cstringT lastCharPtr = NULL;
-		for(char currentChar; (currentChar = *str); str++)
-		{
-			if(currentChar == character)
-			{
-				lastCharPtr = str;
-			}
-		}
-		return lastCharPtr;
-	}
-
-	//Это просто более удобное название для strstr.
-	CSTRING_TEMPLATE strfindsub(cstringT* str1, const char* str2)
-	{
-		return strstr(str1, str2);
-	}
-
-	//это strstr, но указатель сдвигается на размер str2.
-	//То есть пропускает найденную подстроку,
-	//путём возвращения указателя на место после неё.
-	CSTRING_TEMPLATE strskipsub(cstringT str1, const char* str2)
-	{
-		cstringT result = strstr(str1, str2);
-		while(*str2 != '\0')
-		{
-			str2 ++;
-		}
-		return result;
 	}
 
 	template<class num_t> num_t packString(const char* string)
