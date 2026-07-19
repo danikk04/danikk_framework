@@ -5,101 +5,87 @@
 #include <danikk_framework/type_traits.h>
 #include <danikk_framework/number_base.h>
 #include <danikk_framework/internal/generic_string.h>
+#include <danikk_framework/assert.h>
+#include <danikk_framework/array.h>
 #include <string>
 #include <cstring>
 #include <cstdlib>
 
 namespace danikk_framework
 {
-	template<size_t _capacity> class StaticString : public GenericString
+	template<size_t _capacity> class StaticString : public GenericString, Array<char, _capacity>
 	{
-	private:
-		char m_data[_capacity];
-		size_t m_size = 0;
-
-		void write(const char* data, size_t size)
-		{
-			memcpy(end(), data, size);
-			m_size += size;
-		}
 	public:
 		StaticString()
 		{
 
 		}
 
-		StaticString(StaticString& other)
-		{
-			memcpy(m_data, other.m_data, other.size());
-			m_size = other.m_size;
-		}
-
-		StaticString(StaticString&& other)
-		{
-			memcpy(m_data, other.m_data, other.size());
-			m_size = other.m_size;
-		}
+		typedef Array<char, _capacity> parent;
 
 		const char* data() const
 		{
-			return m_data;
+			return parent::data();
 		}
 
 		const char* begin() const
 		{
-			return m_data;
+			return parent::begin();
 		}
 
 		const char* end() const
 		{
-			return m_data + m_size;
+			return parent::end();
 		}
 
 		char* data()
 		{
-			return m_data;
+			return parent::data();
 		}
 
 		char* begin()
 		{
-			return m_data;
+			return parent::begin();
 		}
 
 		char* end()
 		{
-			return m_data + m_size;
+			return parent::end();
 		}
 
 		size_t size() const
 		{
-			return m_size;
+			return parent::size();
 		}
 
 		size_t capacity() const
 		{
-			return _capacity;
+			return parent::capacity();
 		}
 
 		void resize(size_t new_size)
 		{
-			reserve(m_size + new_size);
-			m_size = new_size;
+			parent::resize(new_size);
 		}
 
-		void addsize(size_t add_size)
+		void addsize(size_t plus_size)
 		{
-			reserve(add_size);
-			m_size += add_size;
+			parent::addsize(plus_size);
 		}
 
 		void substractsize(size_t minus_size)
 		{
-			m_size -= minus_size;
+			parent::substractsize(minus_size);
 		}
 
-		void reserve(size_t add_size)
+		void reserve(size_t new_size)
 		{
-			assert(m_size + add_size <= _capacity);
+			parent::reserve(new_size);
+		}
+
+		void clear()
+		{
+			parent::clear();
 		}
 	};
 }

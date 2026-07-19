@@ -1,10 +1,8 @@
 #pragma once
 
-#if not __has_include(<zip.h>)
-	#error cant find zip.h, install libzip
-#endif
+#include </usr/include/libzip/zip.h>
 
-#include <zip.h>
+
 
 namespace danikk_framework
 {

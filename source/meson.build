@@ -3,7 +3,6 @@ source = files(
 	'assert.cpp',
 	'bufferized_filestream.cpp',
 	'chunked_db.cpp',
-	'config.cpp',
 	'countdown.cpp',
 	'cstring.cpp',
 	'datetime.cpp',

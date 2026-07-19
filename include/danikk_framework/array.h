@@ -6,7 +6,7 @@
 
 namespace danikk_framework
 {
-	template <class value_t, size_t m_capacity> class Array
+	template <class value_t, size_t m_capacity, class size_t = size_t> class Array
 	{
 	private:
 		value_t m_data[m_capacity];
@@ -87,6 +87,22 @@ namespace danikk_framework
 		{
 			assert(m_size <= m_capacity);
 			m_size = _size;
+		}
+
+		void addsize(size_t add_size)
+		{
+			reserve(add_size);
+			m_size += add_size;
+		}
+
+		void substractsize(size_t minus_size)
+		{
+			m_size -= minus_size;
+		}
+
+		void reserve(size_t add_size)
+		{
+			assert(m_size + add_size <= m_capacity);
 		}
 
 		value_t& pushCtor()
