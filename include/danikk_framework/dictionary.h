@@ -10,46 +10,34 @@
 
 namespace danikk_framework
 {
-	template<class valueT> class StringKeyDictionary
+	template<class key_t, class value_t> class DynamicDictionary
 	{
 	public:
 		struct pair
 		{
-			String key;
-			valueT value;
+			key_t key;
+			value_t value;
 		};
 	private:
 		DynamicArray<pair> data;
 	public:
-		StringKeyDictionary() = default;
+		DynamicDictionary() = default;
 
-		template<class key_t> void insert(const key_t& key, const valueT& value)
+		void insert(const key_t& key, const value_t& value)
 		{
 			pair& new_pair = data.pushCtor();
 			new_pair.key = key;
 			new_pair.value = value;
 		}
 
-		template<class key_t> void insert(const key_t& key, valueT& value)
+		void insert(const key_t& key, value_t&& value)
 		{
 			pair& new_pair = data.pushCtor();
 			new_pair.key = key;
 			new_pair.value = value;
 		}
 
-		valueT* get(const char* key)
-		{
-			for(pair& p : data)
-			{
-				if(strequal(p.key.c_string(), key))
-				{
-					return &p.value;
-				}
-			}
-			return NULL;
-		}
-
-		valueT* get(const String& key)
+		value_t* get(const key_t& key)
 		{
 			for(pair& p : data)
 			{
@@ -62,24 +50,17 @@ namespace danikk_framework
 		}
 	};
 
-	template<class len_t, size_t capacity> class StaticInlineStringDictionary
+	template<class len_t, size_t capacity> class InlineStringDictionary
 	{
-		char* m_data;
+		char* m_data = NULL;
 		struct key_value_pair
 		{
 			len_t key_offset;
 			len_t value_offset;
 		};
 		key_value_pair m_array[capacity];
-		size_t m_size;
+		size_t m_size = 0;
 	public:
-
-		StaticInlineStringDictionary()
-		{
-			m_data = NULL;
-			m_size = 0;
-		}
-
 		void setData(char* data)
 		{
 			m_data = data;
@@ -96,13 +77,13 @@ namespace danikk_framework
 		}
 	};
 
-	template<class len_t> class InlineStringDictionary
+	template<class size_t> class DynamicInlineStringDictionary
 	{
 		char* m_data;
 		struct key_value_pair
 		{
-			len_t key_offset;
-			len_t value_offset;
+			size_t key_offset;
+			size_t value_offset;
 		};
 		DynamicArray<key_value_pair> m_array;
 	public:
@@ -111,7 +92,7 @@ namespace danikk_framework
 			m_data = data;
 		}
 
-		void addPair(len_t key, len_t value)
+		void addPair(size_t key, size_t value)
 		{
 			m_array.push(key_value_pair{key, value});
 		}
@@ -119,6 +100,45 @@ namespace danikk_framework
 		void addPair(const char* key, const char* value)
 		{
 			m_array.push(key_value_pair{key - m_data, value - m_data});
+		}
+
+		template<class value_t> value_t get(const String& key)
+		{
+			return get<value_t>(key.c_string());
+		}
+
+		template<class value_t> value_t get(const char* key)
+		{
+			const char* result = NULL;
+			for(const key_value_pair& pair : m_array)
+			{
+				const char* current_key = m_data + pair.key_offset;
+				if (strcmp(current_key, key) == 0)
+				{
+					result = m_data + pair.value_offset;
+					break;
+				}
+			}
+
+			if constexpr(std::is_same<value_t, const char*>::value)
+			{
+				return result;
+			}
+			else if constexpr(is_number<value_t>::value)
+			{
+				if(result != NULL)
+				{
+					return parseNumber<value_t>(result);
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			else
+			{
+				return value_t(result);
+			}
 		}
 	};
 

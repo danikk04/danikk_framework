@@ -11,8 +11,6 @@ namespace danikk_framework
 		void log();
 
 		void init(int argc,char** argv);
-
-		void toConfig(Config& cnf);
 	}
 
 	#define ARGV_INIT() danikk_framework::argv::init(argc, argv);

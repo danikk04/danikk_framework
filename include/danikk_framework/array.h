@@ -158,27 +158,27 @@ namespace danikk_framework
 			}
 		}
 
-		inline bool isEmpty()
+		bool isEmpty()
 		{
 			return m_size == 0;
 		}
 
-		inline value_t* data()
+		value_t* data()
 		{
 			return (value_t*)m_data;
 		}
 
-		inline const value_t* data() const
+		const value_t* data() const
 		{
 			return (value_t*)m_data;
 		}
 
-		inline size_t size() const
+		size_t size() const
 		{
 			return m_size;
 		}
 
-		inline size_t capacity() const
+		size_t capacity() const
 		{
 			return m_capacity;
 		}

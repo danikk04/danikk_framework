@@ -5,76 +5,66 @@
 
 namespace danikk_framework
 {
-	template<class container> void readConfigDictionary(container& output, const char filename)
+	template<class size_t> void inlineParseConfig(DynamicInlineStringDictionary<size_t>& out, char* data)
 	{
+		out.setData(data);
 
-	}
+		size_t i = 0;
+		size_t key_offset = 0;
+		size_t value_offset = 0;
+		size_t end = false;
 
-	void inlineParseConfig(char* data)
-	{
-		m_data = str;
-		String key;
-		String value;
-		const char* end = strchr(str, '\0');
-		while(true)
+		while(!end)
 		{
-			char* key = str;
-			str = strchr(str, '=') + 1;
-			char* value = str;
-			str = strchr(str, '\n');
-			str = str ? str + 1 : end;
+			start:
+			for(;data[i] == '\n'; i++);
 
-			addPair(key, value);
+			key_offset = i;
 
-			if(curstr >= end)
+			while(true)//парсинг ключа
 			{
-				break;
+				char chr = data[i];
+				if(chr == '\0')
+				{
+					i++;
+					goto start;
+				}
+				else if(chr == '=')
+				{
+					data[i] = '\0';
+					i++;
+					break;
+				}
+				else
+				{
+					i++;
+				}
 			}
+
+			value_offset = i;
+
+			while(true)//парсинг значения
+			{
+				char chr = data[i];
+
+				if(chr == '\0')
+				{
+					end = true;
+					break;
+				}
+				else if(chr == '\n')
+				{
+					data[i] = '\0';
+					i++;
+					break;
+				}
+				else
+				{
+					i++;
+				}
+			}
+
+			out.addPair(key_offset, value_offset);
 		}
 	}
 }
-
-
-/*void Config::openData(String& data)
-	{
-		openData(data.c_string());
-	}
-
-	void Config::openData(const char* str)
-	{
-		String key;
-		String value;
-		const char* end = strchr(str, '\0');
-		while(true)
-		{
-			char* key = str;
-			str = strchr(str, '=') + 1;
-			char* value = str;
-			str = strchr(str, '\n');
-			str = str ? str + 1 : end;
-
-			m_data.insert(key, value);
-
-			if(curstr >= end)
-			{
-				break;
-			}
-		}
-		m_opened = true;
-	}
-
-	void Config::openFile(const char* filename)
-	{
-		String data;
-		FileReader reader;
-		reader.open(filename);
-		if(!reader.isOpen())
-		{
-			formatLogInfo("!reader.isOpen() : %", filename);
-		}
-		data.resize(reader.size());
-		reader.read(data.data(), data.size());
-		data.cutChars('\r');
-		openData(data);
-
-	}*/

@@ -23,6 +23,11 @@ namespace danikk_framework
 
 		typedef Array<char, _capacity> parent;
 
+		const char& operator[](size_t index)
+		{
+			return data()[index];
+		}
+
 		const char* data() const
 		{
 			return parent::data();
@@ -60,7 +65,7 @@ namespace danikk_framework
 
 		size_t capacity() const
 		{
-			return parent::capacity();
+			return _capacity;
 		}
 
 		void resize(size_t new_size)

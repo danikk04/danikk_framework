@@ -44,7 +44,7 @@ namespace danikk_framework
 			return remaining_argv;
 		}
 
-		void toConfig(Config& cnf)
+		/*void toConfig(Config& cnf)
 		{
 			if(remaining() > 0)
 			{
@@ -67,7 +67,7 @@ namespace danikk_framework
 					formatLogInfo("key:% value:%", flag_name, value);
 				}
 			}
-		}
+		}*/
 
 		void log()
 		{

@@ -89,11 +89,11 @@ namespace danikk_framework
 		return out;
 	}
 
-	inline glm::ivec2 ivec2_from_string(const String& data)
+	inline glm::ivec2 ivec2_from_string(const String& data, char separator)
 	{
 		String first;
 		String second;
-		const char* space_ptr = data.find(' ');
+		const char* space_ptr = data.find(separator);
 		if(space_ptr == NULL)
 		{
 			return glm::ivec2(0, 0);
