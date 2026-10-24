@@ -117,13 +117,10 @@ namespace danikk_framework
 
 		value_t& operator[](uvec3 index)
 		{
-			assert(index.x < m_size.x);
-			assert(index.y < m_size.y);
-			assert(index.z < m_size.z);
+			assert(isValidIndex(index));
 
-			return m_data[index.x +
-						  index.y * m_size.x +
-						  index.z * m_size.x * m_size.y];
+			//return m_data[index.x + index.y * m_size.x + index.z * m_size.x * m_size.y];
+			return m_data[index.x + m_size.x * (index.y + m_size.y * index.z)];
 		}
 		value_t& operator[](index_t index)
 		{
@@ -167,12 +164,12 @@ namespace danikk_framework
 			return m_data + data_size;
 		}
 
-		value_type* begin() const
+		const value_type* begin() const
 		{
 			return m_data;
 		}
 
-		value_type* end() const
+		const value_type* end() const
 		{
 			return m_data + data_size;
 		}
