@@ -74,13 +74,13 @@ namespace danikk_framework
 	bool LineFileReader::read(String& str)
 	{
 		str.clear();
-		while(str.size() == 0 || str.last() != '\n')
+		while(true)
 		{
-			if(buffer_offset == buffer.capacity())
+			if(buffer_offset == buffer.capacity() || buffer.size() == 0)				//если буффер прочитан, то нужно читать из файла
 			{
-				buffer_offset = 0;
-				size_t read_size = FileStream::read(buffer.data(), buffer.capacity());
-				if(read_size != buffer.capacity())
+				buffer_offset = 0;														//обнуляем смещение в буффере
+				size_t read_size = FileStream::read(buffer.data(), buffer.capacity());	//читаем из файла в буффер
+				if(read_size != buffer.capacity())										//если прочитали меньше чем вместимость буффера, то нужно изменить размер буффера
 				{
 					buffer.resize(read_size);
 				}
