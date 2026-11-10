@@ -1,3 +1,5 @@
+#include <danikk_framework/misc/html.h>
+
 namespace danikk_framework
 {
 	namespace internal
@@ -200,8 +202,7 @@ namespace danikk_framework
 	#undef case
 	}
 
-	using namespace internal;
-
+	
 	void HtmlNode::checkNull()
 	{
 		if(isNull())
@@ -218,7 +219,7 @@ namespace danikk_framework
 	const char* HtmlNode::text()
 	{
 		checkNull();
-		if(isTextHtmlType(ptr->type))
+		if(internal::isTextHtmlType(ptr->type))
 		{
 			return ptr->v.text.text;
 		}
@@ -255,7 +256,7 @@ namespace danikk_framework
 		while(iterator != end)
 		{
 			GumboNode* current = *iterator;
-			if(isUsedHtmlNode(current))
+			if(internal::isUsedHtmlNode(current))
 			{
 				result.push(current);
 			}
@@ -277,7 +278,7 @@ namespace danikk_framework
 			{
 				return;
 			}
-			else if(!isUsedHtmlNode(node))
+			else if(!internal::isUsedHtmlNode(node))
 			{
 				iterator++;
 			}
@@ -298,7 +299,7 @@ namespace danikk_framework
 			return result;
 		}
 
-		while(!isUsedHtmlNode(*iterator))
+		while(!internal::isUsedHtmlNode(*iterator))
 		{
 			iterator++;
 			if(iterator == end)
@@ -363,7 +364,7 @@ namespace danikk_framework
 
 	HtmlNode HtmlNode::operator[](size_t childIndex)
 	{
-		return HtmlNode(getHtmlChild(ptr, childIndex));
+		return HtmlNode(internal::getHtmlChild(ptr, childIndex));
 	}
 
 	HtmlNode HtmlNode::findByAttribute(const char* key, const char* value)
@@ -473,7 +474,7 @@ namespace danikk_framework
 
 	HtmlNode HtmlDocument::operator[](size_t childIndex)
 	{
-		return HtmlNode(getHtmlChild(ptr->document, childIndex));
+		return HtmlNode(internal::getHtmlChild(ptr->document, childIndex));
 	}
 
 	HtmlNode HtmlDocument::body()
@@ -499,5 +500,11 @@ namespace danikk_framework
 			case(GUMBO_NODE_TEMPLATE)
 			default: return "NOT_EXITS";
 		}
+	}
+	#undef case
+
+	const char* htmlTagToString(size_t tag)
+	{
+		return internal::htmlTagToString(tag);
 	}
 }

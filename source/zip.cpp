@@ -1,10 +1,11 @@
+#include <cstring>
 #include <danikk_framework/danikk_framework.h>
 #include <danikk_framework/string.h>
 #include <danikk_framework/number.h>
 #include <danikk_framework/filesystem.h>
 #include <danikk_framework/zip.h>
 #include <filesystem>
-#include "../array.h"
+#include <danikk_framework/array.h>
 
 using namespace std;
 using namespace std::filesystem;

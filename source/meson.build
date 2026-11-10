@@ -8,6 +8,7 @@ source = files(
 	'datetime.cpp',
 	'filesystem.cpp',
 	'generic_string.cpp',
+	'zip.cpp',
 	'filestream.cpp',
 	'line_getter.cpp',
 	'localization.cpp',
@@ -23,3 +24,7 @@ source = files(
 	'string.cpp',
 	'log.cpp',
 )
+
+if gumbo_dep.found()
+	source += files('html.cpp')
+endif
