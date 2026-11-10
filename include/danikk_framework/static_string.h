@@ -4,7 +4,7 @@
 #include <danikk_framework/string.h>
 #include <danikk_framework/type_traits.h>
 #include <danikk_framework/number_base.h>
-#include <danikk_framework/internal/generic_string.h>
+#include <danikk_framework/generic_string.h>
 #include <danikk_framework/assert.h>
 #include <danikk_framework/array.h>
 #include <string>

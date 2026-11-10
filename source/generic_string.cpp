@@ -1,4 +1,4 @@
-#include <danikk_framework/internal/generic_string.h>
+#include <danikk_framework/generic_string.h>
 #include <danikk_framework/number.h>
 
 using namespace std;
