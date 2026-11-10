@@ -89,13 +89,13 @@ namespace danikk_framework
 	    friend const PathBuffer& getDesktopDirectory();
 
 	    friend const PathBuffer& getExecutableDirectory();
+	    template<class stream_t>
+	    friend stream_t& operator<<(stream_t& out, const PathBuffer& data)
+	    {
+	    	 out << data.c_string();
+	    	 return out;
+	    }
     };
-
-    template<class stream_t> stream_t& operator <<(stream_t& cout, const PathBuffer& data)
-    {
-    	cout << data.c_string();
-    	return cout;
-    }
 
     template<class stringT> PathBuffer& PathBuffer::pushDirectory(const stringT& name)
     {
