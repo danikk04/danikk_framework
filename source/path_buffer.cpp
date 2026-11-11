@@ -273,7 +273,7 @@ namespace danikk_framework
     	{
             #if IS_LINUX
                 String desktopPath;
-                cmd::execr(desktopPath, "xdg-user-dir DESKTOP");
+                cmd::exec(desktopPath, "xdg-user-dir DESKTOP");
                 while(desktopPath.last() != '\n')
                 {
                 	desktopPath.resize(desktopPath.size() - 1);

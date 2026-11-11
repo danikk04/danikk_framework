@@ -10,6 +10,8 @@
 #include <danikk_framework/log.h>
 #include <danikk_framework/localization.h>
 
+#include <cstdio>
+#include <cstring>
 #include <thread>
 
 namespace danikk_framework
@@ -36,6 +38,34 @@ namespace danikk_framework
 
 	namespace cmd
 	{
+		template<class firstT,class... Types> int exec(String& output, firstT command,Types... args)
+		{
+			using namespace internal;
+			String command_buffer;
+			command_buffer << command;
+			writeArgs(command_buffer, args...);
+
+			if constexpr(IS_DEBUG)
+			{
+				formatLogDebug("% : %", localization("exec_cmd"), command_buffer);
+			}
+
+			output.clear();
+			FILE* pipe = popen(command_buffer.c_string(), "r");
+			if(pipe == NULL)
+			{
+				return -1;
+			}
+
+			char buffer[128];
+			while(fgets(buffer, sizeof(buffer), pipe) != NULL)
+			{
+				output.append(buffer, std::strlen(buffer));
+			}
+
+			return pclose(pipe);
+		}
+
 		template<class command_t> int exec(const command_t& command)
 		{
 			if constexpr(IS_DEBUG)
@@ -61,58 +91,5 @@ namespace danikk_framework
 			return system(command_buffer.c_string());
 		}
 
-		inline void execr(String& result, const char* cmd)
-		{
-			FILE* pipe = popen(cmd, "r");
-		   	if (pipe == NULL)
-		   	{
-		   		goto end;
-		   	}
-		   	result.clear();
-		    char buffer[128];
-		    while (!feof(pipe)) {
-		        if (fgets(buffer, 128, pipe) != NULL)
-		        {
-		        	result.append((const char*)buffer, 128);
-		        }
-		    }
-			pclose(pipe);
-		    end:
-		    return;
-		}
-
-		template<class firstT,class... Types> int exec_file_read(String& result, firstT command, Types... args)
-		{
-			using namespace internal;
-
-			PathBuffer tempFilePathBuffer;
-			tempFilePathBuffer.setPath(getTempDirectory());
-			format(result, "temp_cmd_%.data", (size_t)&result);//result будет использован как буффер для пути
-			tempFilePathBuffer.setFileName(result);
-
-			result.clear();//result будет использован как буффер для команды.
-			result << command;
-			writeArgs(result, args...);
-			result << " >" << tempFilePathBuffer.c_string();
-			result << command_null_output;
-
-			if constexpr(IS_DEBUG)
-			{
-				formatLogDebug("% : %", localization("exec_cmd"), result);
-			}
-
-			int res = system(result.c_string());
-
-			result.clear();
-
-			FileReader reader;
-			reader.open(tempFilePathBuffer);
-			assert(reader.isOpen());
-			result.resize(reader.size());
-			reader.read(result.data(), result.size());
-			removeFile(tempFilePathBuffer);
-
-			return res;
-		}
 	}
 }
