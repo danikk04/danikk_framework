@@ -45,7 +45,6 @@ namespace danikk_framework
 
 		GenericString& operator << (char data)
 		{
-			*end() = data;
 			size_t old_size = size();
 			resize(old_size + 1);
 			this->data()[old_size] = data;
