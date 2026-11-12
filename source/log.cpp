@@ -55,8 +55,10 @@ namespace danikk_framework
 		else if(log_config.use_application_time)
 		{
 			uint64 elapsed_time = getSystemTimeInMilliseconds() - start_time;
+			char elapsed_chars[32];
+			size_t elapsed_size = writeNumberToStringBuffer(elapsed_time, elapsed_chars, sizeof(elapsed_chars));
 			StaticString<32> elapsed_buffer;
-			elapsed_buffer.resize(writeNumberToStringBuffer(elapsed_time, elapsed_buffer.data(), elapsed_buffer.capacity()));
+			elapsed_buffer.copyData(elapsed_chars, elapsed_size);
 
 			log_buffer << n_chars(' ',12 - std::max(elapsed_buffer.size(), (size_t)4));
 			StaticString<32> num_buffer;
