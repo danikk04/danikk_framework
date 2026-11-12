@@ -7,6 +7,7 @@
 #include <danikk_framework/number.h>
 #include <stdlib.h>
 #include <string>
+#include <limits>
 
 using namespace std;
 
@@ -159,17 +160,20 @@ namespace danikk_framework
 
 	String::String()
 	{
-    	m_data = 0;
-    	m_size = 0;
-    	m_capacity = 0;
 	}
 
     String::String(const String& other)
     {
         m_size = other.m_size;
+		if(m_size == 0)
+		{
+			return;
+		}
         m_capacity = m_size + 1;
 		m_data = (char*)malloc(m_capacity);
-		memcpy(m_data, other.m_data, m_size);
+		if(m_data == nullptr) std::abort();
+		memcpy(m_data, other.data(), m_size);
+		m_data[m_size] = '\0';
     }
 
 	String::String(const std::string& value):String((const char*)value.data(), value.size())
@@ -179,18 +183,42 @@ namespace danikk_framework
 
     String::String(String&& other)
     {
-    	assert((ptrdiff_t)this != (ptrdiff_t)&other);
 		m_data = other.m_data;
 		m_size = other.m_size;
 		m_capacity = other.m_capacity;
-		new (&other) String();
+		other.m_data = nullptr;
+		other.m_size = 0;
+		other.m_capacity = 0;
+		other.m_empty = '\0';
     }
+
+	String& String::operator=(String&& other)
+	{
+		if(this == &other)
+		{
+			return *this;
+		}
+		free(m_data);
+		m_data = other.m_data;
+		m_size = other.m_size;
+		m_capacity = other.m_capacity;
+		other.m_data = nullptr;
+		other.m_size = 0;
+		other.m_capacity = 0;
+		other.m_empty = '\0';
+		return *this;
+	}
 
 	String::String(const char* ptr, size_t size)
 	{
         m_size = size;
+		if(size == 0)
+		{
+			return;
+		}
         m_capacity = m_size + 1;
 		m_data = (char*)malloc(m_capacity);
+		if(m_data == nullptr) std::abort();
 		memcpy(m_data, ptr, m_size);
     	m_data[m_size] = '\0';
 	}
@@ -227,21 +255,33 @@ namespace danikk_framework
     	m_data = ptr;
     	m_size = size;
     	m_capacity = capacity;
+		if(m_data == nullptr)
+		{
+			if(m_size != 0 || m_capacity != 0) std::abort();
+			return;
+		}
+		if(m_capacity <= m_size) std::abort();
+		m_data[m_size] = '\0';
     }
 
     String::String(size_t size)
 	{
     	m_size = size;
+		if(size == 0) return;
     	m_capacity = size + 1;
     	m_data = (char*)malloc(m_capacity);
+		if(m_data == nullptr) std::abort();
+		memset(m_data, 0, m_size);
     	m_data[m_size] = '\0';
 	}
 
 	String::String(size_t size, char initChar)
 	{
     	m_size = size;
+		if(size == 0) return;
     	m_capacity = size + 1;
     	m_data = (char*)malloc(m_capacity);
+		if(m_data == nullptr) std::abort();
     	memset(m_data, initChar, m_size);
     	m_data[m_size] = '\0';
 	}
@@ -257,41 +297,31 @@ namespace danikk_framework
 
     void String::reserve(size_t count)
 	{
-		size_t target_capacity = count + m_size + 1;
-		if(m_capacity >= target_capacity)							//Если вместимости хватает.
+		if(count == 0 && m_data == nullptr) return;
+		if(count == std::numeric_limits<size_t>::max()) std::abort();
+		size_t target_capacity = count + 1;
+		if(m_capacity >= target_capacity)						//Вместимости хватает.
 		{
-			return;													//То ничего не делает.
+			return;
 		}
 
-		if(m_data != NULL)
+		size_t new_capacity = m_capacity < 16 ? 16 : m_capacity;
+		while(new_capacity < target_capacity)
 		{
-			if(target_capacity < 16)
+			if(new_capacity > std::numeric_limits<size_t>::max() / 2)
 			{
-				m_capacity = 16;
+				new_capacity = target_capacity;
+				break;
 			}
-			else
-			{
-				while(m_capacity < target_capacity)
-				{
-					m_capacity <<= 1;
-				}
-			}
-
-			//m_data = (char*)realloc(m_data, m_capacity);
-
-			char* new_data = (char*)malloc(m_capacity);
-			memcpy(new_data, m_data, m_size);
-			free(m_data);
-			m_data = new_data;
+			new_capacity *= 2;
 		}
-		else
-		{
-			m_capacity = 1;
-			while(m_capacity < target_capacity)
-			{
-				m_capacity <<= 1;
-			}
-			m_data = (char*)malloc(m_capacity);
-		}
+
+		char* new_data = (char*)malloc(new_capacity);
+		if(new_data == nullptr) std::abort();
+		if(m_size != 0) memcpy(new_data, data(), m_size);
+		new_data[m_size] = '\0';
+		free(m_data);
+		m_data = new_data;
+		m_capacity = new_capacity;
 	}
 }

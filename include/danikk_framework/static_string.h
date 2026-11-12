@@ -18,7 +18,7 @@ namespace danikk_framework
 	public:
 		StaticString()
 		{
-
+			data()[0] = '\0';
 		}
 
 		typedef Array<char, _capacity> parent;
@@ -65,32 +65,46 @@ namespace danikk_framework
 
 		size_t capacity() const
 		{
-			return _capacity;
+			return _capacity == 0 ? 0 : _capacity - 1;
 		}
 
 		void resize(size_t new_size)
 		{
+			assert(new_size <= capacity());
+			if(new_size > size())
+			{
+				memset(data() + size(), 0, new_size - size());
+			}
 			parent::resize(new_size);
+			data()[new_size] = '\0';
 		}
 
-		void addsize(size_t plus_size)
+		void resize(size_t new_size, char fill_character)
 		{
-			parent::addsize(plus_size);
+			assert(new_size <= capacity());
+			if(new_size > size())
+			{
+				memset(data() + size(), fill_character, new_size - size());
+			}
+			parent::resize(new_size);
+			data()[new_size] = '\0';
 		}
 
 		void substractsize(size_t minus_size)
 		{
+			assert(minus_size <= size());
 			parent::substractsize(minus_size);
+			data()[size()] = '\0';
 		}
 
 		void reserve(size_t new_size)
 		{
-			parent::reserve(new_size);
+			assert(new_size <= capacity());
 		}
 
 		void clear()
 		{
-			parent::clear();
+			resize(0);
 		}
 	};
 }

@@ -87,9 +87,13 @@ namespace danikk_framework
 
     void MemoryBuffer::moveTo(String& data)
     {
+		reserve(1);
+		if(data.m_data != nullptr && data.m_data != m_data) free(data.m_data);
     	data.m_data = m_data;
     	data.m_size = m_size;
     	data.m_capacity = m_capacity;
+     data.m_empty = '\0';
+     data.m_data[data.m_size] = '\0';
     	m_size = m_capacity = 0;
     	m_data = NULL;
     }

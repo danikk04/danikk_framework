@@ -1,7 +1,7 @@
 #pragma once
 
 #include<danikk_framework/danikk_framework.h>
-#include<danikk_framework/cataloged_dictionary.h>
+#include <danikk_framework/dictionary.h>
 #include<danikk_framework/string.h>
 #include<danikk_framework/cstring_functions.h>
 #include<initializer_list>
@@ -21,7 +21,7 @@ namespace danikk_framework
 	class Localization
 	{
 	private:
-		CatalogedDictionary<String, '.'> m_data;
+		DynamicDictionary<String, String> m_data;
 	public:
 		struct LocalizationPair
 		{

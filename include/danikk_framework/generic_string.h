@@ -29,7 +29,6 @@ namespace danikk_framework
 
 	    char* c_string()
 	    {
-	    	reserve(1);
 	        data()[size()] = '\0';
 	        return data();
 	    }
@@ -46,9 +45,10 @@ namespace danikk_framework
 
 		GenericString& operator << (char data)
 		{
-			reserve(1);
 			*end() = data;
-			addsize(1);
+			size_t old_size = size();
+			resize(old_size + 1);
+			this->data()[old_size] = data;
 			return *this;
 		}
 
@@ -218,7 +218,7 @@ namespace danikk_framework
 		virtual size_t size() const = 0;
 		virtual size_t capacity() const = 0;
 		virtual void resize(size_t new_size) = 0;
-		virtual void addsize(size_t plus_size) = 0;
+		virtual void resize(size_t new_size, char fill_character) = 0;
 		virtual void substractsize(size_t minus_size) = 0;
 		virtual void reserve(size_t) = 0;
 	};

@@ -1,6 +1,10 @@
 #include <danikk_framework/generic_string.h>
 #include <danikk_framework/number.h>
 
+#include <cstdint>
+#include <cstdlib>
+#include <limits>
+
 using namespace std;
 
 namespace danikk_framework
@@ -158,114 +162,125 @@ namespace danikk_framework
 
 	GenericString& GenericString::replace(const GenericString& sub, const GenericString& result)
 	{
-		size_t resultSize = result.size();
-		size_t subSize = sub.size();
-
-		if(resultSize < subSize)
+		const size_t old_size = size();
+		const size_t sub_size = sub.size();
+		const size_t result_size = result.size();
+		if(sub_size == 0 || sub_size > old_size)
 		{
-			char* endPtr = end();
-			char* currentWritePtr = data();
-			char* currentReadPtr = data();
-			size_t deltaSize = sub.size() - result.size();
+			return *this;
+		}
 
-			while(currentReadPtr != endPtr)
+		const char* original = data();
+		const char* search = sub.data();
+		const char* replacement = result.data();
+		size_t match_count = 0;
+		for(size_t offset = 0; offset + sub_size <= old_size;)
+		{
+			if(memcmp(original + offset, search, sub_size) == 0)
 			{
-				if(strstartswith(currentReadPtr, sub))
-				{
-					memcpy(currentWritePtr, result.data(), resultSize);
-					currentWritePtr += resultSize;
-					currentReadPtr += subSize;
-					addsize(deltaSize);
-				}
-				else
-				{
-					*currentWritePtr = *currentReadPtr;//ХЗ
-					currentWritePtr++;
-					currentReadPtr++;
-				}
+				++match_count;
+				offset += sub_size;
+			}
+			else
+			{
+				++offset;
 			}
 		}
-		else if(resultSize == subSize)
+		if(match_count == 0)
 		{
-			char* endPtr = end();
-			char* currentPtr = data();
+			return *this;
+		}
 
-			while(currentPtr != endPtr)
+		size_t new_size = old_size;
+		if(result_size >= sub_size)
+		{
+			const size_t growth_per_match = result_size - sub_size;
+			if(growth_per_match != 0 && match_count > (std::numeric_limits<size_t>::max() - old_size) / growth_per_match)
 			{
-				if(strstartswith(currentPtr, sub))
-				{
-					memcpy(currentPtr, result.data(), resultSize);
-					currentPtr += resultSize;
-				}
+				std::abort();
 			}
+			new_size += match_count * growth_per_match;
 		}
 		else
 		{
-			size_t subCount = 0;
-
-			{
-				char* endPtr = end();
-				char* currentPtr = data();
-
-				while(currentPtr < endPtr)
-				{
-					if(strstartswith(currentPtr, sub))
-					{
-						currentPtr += subSize;
-						subCount++;
-					}
-					else
-					{
-						currentPtr++;
-					}
-				}
-			}
-
-			size_t deltaSize = resultSize - subSize;
-			size_t sizeGrow = subCount * deltaSize;
-
-			addsize(sizeGrow);
-
-			//Вся строка будет перемещена во временный стековый буффер
-			char* tempStringCopy = (char*)alloca(size());
-			memcpy(tempStringCopy, data(), size());
-			char* endPtr = tempStringCopy + size();
-			char* writePtr = data();
-			char* readPtr = tempStringCopy;
-
-			while(readPtr < endPtr)
-			{
-				if(strstartswith(readPtr, sub))
-				{
-					memcpy(writePtr, result.data(), resultSize);
-					readPtr += subSize;
-					writePtr += resultSize;
-				}
-				else
-				{
-					*writePtr++ = *readPtr++;
-				}
-			}
+			new_size -= match_count * (sub_size - result_size);
+		}
+		if(new_size == std::numeric_limits<size_t>::max())
+		{
+			std::abort();
 		}
 
+		char* rebuilt = (char*)malloc(new_size + 1);
+		if(rebuilt == nullptr) std::abort();
+		size_t read_offset = 0;
+		size_t write_offset = 0;
+		while(read_offset < old_size)
+		{
+			if(read_offset + sub_size <= old_size
+				&& memcmp(original + read_offset, search, sub_size) == 0)
+			{
+				if(result_size != 0)
+				{
+					memcpy(rebuilt + write_offset, replacement, result_size);
+				}
+				write_offset += result_size;
+				read_offset += sub_size;
+			}
+			else
+			{
+				rebuilt[write_offset++] = original[read_offset++];
+			}
+		}
+		rebuilt[new_size] = '\0';
+		resize(new_size);
+		if(new_size != 0)
+		{
+			memcpy(data(), rebuilt, new_size);
+		}
+		data()[new_size] = '\0';
+		free(rebuilt);
 		return *this;
 	}
 
 	GenericString& GenericString::appendToStart(const GenericString& str)
 	{
-		uint32 original_size = size();
-		uint32 append_size = str.size();
-		addsize(append_size);
-		memmove(data() + append_size, data(), original_size);
-		memcpy(data(), str.data(), append_size);
+		const size_t original_size = size();
+		const size_t prefix_size = str.size();
+		if(prefix_size > std::numeric_limits<size_t>::max() - original_size)
+		{
+			std::abort();
+		}
+		char* prefix = (char*)malloc(prefix_size == 0 ? 1 : prefix_size);
+		if(prefix == nullptr) std::abort();
+		if(prefix_size != 0) memcpy(prefix, str.data(), prefix_size);
+		resize(size() + prefix_size);
+		memmove(data() + prefix_size, data(), original_size);
+		if(prefix_size != 0) memcpy(data(), prefix, prefix_size);
+		free(prefix);
 		return *this;
 	}
 
     GenericString& GenericString::append(const char* data_ptr, size_t data_size)
     {
-    	reserve(data_size);
-		memcpy(end(), data_ptr, data_size);
-		addsize(data_size);
+		const size_t old_size = size();
+		if(data_size > std::numeric_limits<size_t>::max() - old_size)
+		{
+			std::abort();
+		}
+		const uintptr_t data_address = reinterpret_cast<uintptr_t>(data());
+		const uintptr_t source_address = reinterpret_cast<uintptr_t>(data_ptr);
+		const bool source_aliases_this = source_address >= data_address
+			&& source_address - data_address <= old_size;
+		const size_t source_offset = source_aliases_this ? source_address - data_address : 0;
+		resize(size() + data_size);
+		if(source_aliases_this)
+		{
+			data_ptr = data() + source_offset;
+		}
+		if(data_size != 0)
+		{
+			memmove(data() + old_size, data_ptr, data_size);
+		}
 		return *this;
     }
 

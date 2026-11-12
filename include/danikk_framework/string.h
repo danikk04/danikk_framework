@@ -13,9 +13,10 @@ namespace danikk_framework
     {
     	friend class MemoryBuffer;
     private:
-        char* m_data;//В c_string нужно ставить нуль терминатор в конец строки.
-        size_t m_size;
-        size_t m_capacity;
+        char* m_data = nullptr;
+        size_t m_size = 0;
+        size_t m_capacity = 0;
+        char m_empty = '\0';
     public:
         String();
 
@@ -41,53 +42,61 @@ namespace danikk_framework
 
 		String(size_t size, char initChar);
 
-		String& operator=(const String&) = default;
-
-		String& operator=(String&& other)
+		String& operator=(const String& other)
 		{
-			void* other_mem = (void*)&(String&)other;
-			memcpy((void*)this, other_mem, sizeof(String));
-			memset(other_mem, 0, sizeof(String));
+			if(this != &other)
+			{
+				reserve(other.m_size);
+				if(other.m_size != 0)
+				{
+					memcpy(m_data, other.data(), other.m_size);
+				}
+				m_size = other.m_size;
+				if(m_data != nullptr) m_data[m_size] = '\0';
+				else m_empty = '\0';
+			}
 			return *this;
 		}
 
+		String& operator=(String&& other);
+
 		~String();
 
-	    operator const std::string&() const
+	    operator std::string() const
 		{
-	    	return *((const std::string*)this);
+	    	return std::string(data(), m_size);
 		}
 
 	    operator bool() const;
 
 		const char* data() const
 		{
-			return m_data;
+			return m_data != nullptr ? m_data : &m_empty;
 		}
 
 		const char* begin() const
 		{
-			return m_data;
+			return data();
 		}
 
 		const char* end() const
 		{
-			return m_data + m_size;
+			return data() + m_size;
 		}
 
 		char* data()
 		{
-			return m_data;
+			return m_data != nullptr ? m_data : &m_empty;
 		}
 
 		char* begin()
 		{
-			return m_data;
+			return data();
 		}
 
 		char* end()
 		{
-			return m_data + m_size;
+			return data() + m_size;
 		}
 
 		size_t size() const
@@ -97,31 +106,37 @@ namespace danikk_framework
 
 		size_t capacity() const
 		{
-			return m_capacity;
+			return m_capacity == 0 ? 0 : m_capacity - 1;
 		}
 
 		void resize(size_t new_size)
 		{
-			reserve(m_size + new_size);
-			m_size = new_size;
+			resize(new_size, '\0');
 		}
 
-		void addsize(size_t add_size)
+		void resize(size_t new_size, char fill_character)
 		{
-			reserve(add_size);
-			m_size += add_size;
+			if(new_size > m_size)
+			{
+				reserve(new_size);
+				memset(m_data + m_size, fill_character, new_size - m_size);
+			}
+			m_size = new_size;
+			if(m_data != nullptr) m_data[m_size] = '\0';
+			else m_empty = '\0';
 		}
 
 		void substractsize(size_t minus_size)
 		{
+			assert(minus_size <= m_size);
 			m_size -= minus_size;
+			if(m_data != nullptr) m_data[m_size] = '\0';
+			else m_empty = '\0';
 		}
 
 		const char* c_string() const
 		{
-			const_cast<String*>(this)->reserve(1);
-	        m_data[size()] = '\0';
-	        return data();
+	        return m_data != nullptr ? m_data : "";
 		}
 
 		void reserve(size_t count);

@@ -23,8 +23,19 @@ namespace danikk_framework
 	public:
 		DynamicDictionary() = default;
 
+		~DynamicDictionary()
+		{
+			data.clear();
+		}
+
 		void insert(const key_t& key, const value_t& value)
 		{
+			if(value_t* existing = get(key))
+			{
+				*existing = value;
+				return;
+			}
+
 			pair& new_pair = data.pushCtor();
 			new_pair.key = key;
 			new_pair.value = value;
@@ -32,9 +43,15 @@ namespace danikk_framework
 
 		void insert(const key_t& key, value_t&& value)
 		{
+			if(value_t* existing = get(key))
+			{
+				*existing = danikk_framework::move(value);
+				return;
+			}
+
 			pair& new_pair = data.pushCtor();
 			new_pair.key = key;
-			new_pair.value = value;
+			new_pair.value = danikk_framework::move(value);
 		}
 
 		value_t* get(const key_t& key)

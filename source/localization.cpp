@@ -33,7 +33,7 @@ namespace danikk_framework
 				if(chr == '\n')
 				{
 					is_value_reading = false;
-					m_data.insert_move(keyBuffer.data(), keyBuffer.size(), valueBuffer);//valueBuffer должен "сбросится" до NULL значения.
+					m_data.insert(String(keyBuffer.data(), keyBuffer.size()), danikk_framework::move(valueBuffer));
 					keyBuffer.clear();
 				}
 				else
