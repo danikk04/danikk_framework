@@ -11,6 +11,7 @@
 #include <danikk_framework/localization.h>
 
 #include <cstdio>
+#include <csignal>
 #include <cstring>
 #include <thread>
 
@@ -18,6 +19,13 @@ namespace danikk_framework
 {
 	namespace internal
 	{
+		inline volatile std::sig_atomic_t system_close_signal_received = 0;
+
+		inline void handleSystemCloseSignal(int)
+		{
+			system_close_signal_received = 1;
+		}
+
 		#if IS_LINUX
 			inline const char* command_null_output = " 2>/dev/null";
 		#else
@@ -38,6 +46,18 @@ namespace danikk_framework
 
 	namespace cmd
 	{
+		inline bool checkSystemCloseSig()
+		{
+			static const bool handlers_installed = []()
+			{
+				std::signal(SIGINT, internal::handleSystemCloseSignal);
+				std::signal(SIGTERM, internal::handleSystemCloseSignal);
+				return true;
+			}();
+			(void)handlers_installed;
+			return internal::system_close_signal_received != 0;
+		}
+
 		template<class firstT,class... Types> int exec(String& output, firstT command,Types... args)
 		{
 			using namespace internal;
