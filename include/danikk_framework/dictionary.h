@@ -19,13 +19,28 @@ namespace danikk_framework
 			value_t value;
 		};
 	private:
-		DynamicArray<pair> data;
+		DynamicArray<pair*> data;
 	public:
 		DynamicDictionary() = default;
+		DynamicDictionary(const DynamicDictionary&) = delete;
+		DynamicDictionary& operator=(const DynamicDictionary&) = delete;
 
 		~DynamicDictionary()
 		{
+			for(pair* current : data)
+			{
+				current->~pair();
+				::free(current);
+			}
 			data.clear();
+		}
+
+		pair& appendPair()
+		{
+			pair* value = structalloc<pair>();
+			new (value) pair();
+			data.push(value);
+			return *value;
 		}
 
 		void insert(const key_t& key, const value_t& value)
@@ -36,7 +51,7 @@ namespace danikk_framework
 				return;
 			}
 
-			pair& new_pair = data.pushCtor();
+			pair& new_pair = appendPair();
 			new_pair.key = key;
 			new_pair.value = value;
 		}
@@ -49,16 +64,27 @@ namespace danikk_framework
 				return;
 			}
 
-			pair& new_pair = data.pushCtor();
+			pair& new_pair = appendPair();
 			new_pair.key = key;
 			new_pair.value = danikk_framework::move(value);
 		}
 
 		value_t* get(const key_t& key)
 		{
-			for(pair& p : data)
+			for(pair* current : data)
 			{
-				if(p.key == key)
+				pair& p = *current;
+				bool keys_equal;
+				if constexpr(requires { p.key.data(); p.key.size(); key.data(); key.size(); })
+				{
+					keys_equal = p.key.size() == key.size()
+						&& (p.key.size() == 0 || std::memcmp(p.key.data(), key.data(), p.key.size()) == 0);
+				}
+				else
+				{
+					keys_equal = p.key == key;
+				}
+				if(keys_equal)
 				{
 					return &p.value;
 				}

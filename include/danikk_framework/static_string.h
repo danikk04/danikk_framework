@@ -13,7 +13,7 @@
 
 namespace danikk_framework
 {
-	template<size_t _capacity> class StaticString : public GenericString, Array<char, _capacity>
+	template<size_t _capacity> class StaticString : public GenericString<StaticString<_capacity>>, Array<char, _capacity>
 	{
 	public:
 		StaticString()
@@ -23,10 +23,17 @@ namespace danikk_framework
 
 		typedef Array<char, _capacity> parent;
 
-		const char& operator[](size_t index)
+		char& operator[](size_t index)
 		{
 			return data()[index];
 		}
+
+		const char& operator[](size_t index) const
+		{
+			return data()[index];
+		}
+
+		bool empty() const { return size() == 0; }
 
 		const char* data() const
 		{

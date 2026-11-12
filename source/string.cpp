@@ -85,8 +85,8 @@ namespace danikk_framework
 	String toCodeList(const String& data)
 	{
 		String result;
-		const byte* cur = (const byte*)data.begin();
-		const byte* end = (const byte*)data.end();
+		const byte* cur = (const byte*)data.data();
+		const byte* end = cur + data.size();
 		while(cur < end)
 		{
 			byte chr = *cur;
@@ -99,8 +99,8 @@ namespace danikk_framework
 	String unCodeList(const String& data)
 	{
 		String result;
-		const char* cur = (const char*)data.begin();
-		const char* end = (const char*)data.end();
+		const char* cur = data.data();
+		const char* end = cur + data.size();
 		String numbuf;
 		while(cur < end)
 		{
@@ -137,8 +137,9 @@ namespace danikk_framework
 
 	void unCodeList(String& data)
 	{
-		const char* cur = (const char*)data.begin();
-		const char* end = (const char*)data.end();
+		String source(data);
+		const char* cur = source.data();
+		const char* end = cur + source.size();
 		data.resize(0);
 		String numbuf;
 		while(cur < end)
@@ -158,170 +159,4 @@ namespace danikk_framework
 		}
 	}
 
-	String::String()
-	{
-	}
-
-    String::String(const String& other)
-    {
-        m_size = other.m_size;
-		if(m_size == 0)
-		{
-			return;
-		}
-        m_capacity = m_size + 1;
-		m_data = (char*)malloc(m_capacity);
-		if(m_data == nullptr) std::abort();
-		memcpy(m_data, other.data(), m_size);
-		m_data[m_size] = '\0';
-    }
-
-	String::String(const std::string& value):String((const char*)value.data(), value.size())
-	{
-
-	}
-
-    String::String(String&& other)
-    {
-		m_data = other.m_data;
-		m_size = other.m_size;
-		m_capacity = other.m_capacity;
-		other.m_data = nullptr;
-		other.m_size = 0;
-		other.m_capacity = 0;
-		other.m_empty = '\0';
-    }
-
-	String& String::operator=(String&& other)
-	{
-		if(this == &other)
-		{
-			return *this;
-		}
-		free(m_data);
-		m_data = other.m_data;
-		m_size = other.m_size;
-		m_capacity = other.m_capacity;
-		other.m_data = nullptr;
-		other.m_size = 0;
-		other.m_capacity = 0;
-		other.m_empty = '\0';
-		return *this;
-	}
-
-	String::String(const char* ptr, size_t size)
-	{
-        m_size = size;
-		if(size == 0)
-		{
-			return;
-		}
-        m_capacity = m_size + 1;
-		m_data = (char*)malloc(m_capacity);
-		if(m_data == nullptr) std::abort();
-		memcpy(m_data, ptr, m_size);
-    	m_data[m_size] = '\0';
-	}
-
-	String::String(const char* ptr)
-	{
-		if(ptr != NULL)
-		{
-			new (this) String(ptr, strlen(ptr));
-		}
-		else
-		{
-			new (this) String("", (size_t)0);
-		}
-	}
-
-	String::String(const char* begin, const char* end):String(begin, (ptrdiff_t)end - (ptrdiff_t)begin)
-	{
-
-	}
-
-	String::String(char* ptr):String(ptr, strlen(ptr))
-	{
-
-	}
-
-	String::String(char* ptr, size_t size):String(ptr, size, size + 1)
-	{
-
-	}
-
-    String::String(char* ptr, size_t size, size_t capacity)
-    {
-    	m_data = ptr;
-    	m_size = size;
-    	m_capacity = capacity;
-		if(m_data == nullptr)
-		{
-			if(m_size != 0 || m_capacity != 0) std::abort();
-			return;
-		}
-		if(m_capacity <= m_size) std::abort();
-		m_data[m_size] = '\0';
-    }
-
-    String::String(size_t size)
-	{
-    	m_size = size;
-		if(size == 0) return;
-    	m_capacity = size + 1;
-    	m_data = (char*)malloc(m_capacity);
-		if(m_data == nullptr) std::abort();
-		memset(m_data, 0, m_size);
-    	m_data[m_size] = '\0';
-	}
-
-	String::String(size_t size, char initChar)
-	{
-    	m_size = size;
-		if(size == 0) return;
-    	m_capacity = size + 1;
-    	m_data = (char*)malloc(m_capacity);
-		if(m_data == nullptr) std::abort();
-    	memset(m_data, initChar, m_size);
-    	m_data[m_size] = '\0';
-	}
-
-	String::~String()
-	{
-		if(m_data != NULL)
-		{
-			free(m_data);
-			m_data = NULL;
-		}
-	}
-
-    void String::reserve(size_t count)
-	{
-		if(count == 0 && m_data == nullptr) return;
-		if(count == std::numeric_limits<size_t>::max()) std::abort();
-		size_t target_capacity = count + 1;
-		if(m_capacity >= target_capacity)						//Вместимости хватает.
-		{
-			return;
-		}
-
-		size_t new_capacity = m_capacity < 16 ? 16 : m_capacity;
-		while(new_capacity < target_capacity)
-		{
-			if(new_capacity > std::numeric_limits<size_t>::max() / 2)
-			{
-				new_capacity = target_capacity;
-				break;
-			}
-			new_capacity *= 2;
-		}
-
-		char* new_data = (char*)malloc(new_capacity);
-		if(new_data == nullptr) std::abort();
-		if(m_size != 0) memcpy(new_data, data(), m_size);
-		new_data[m_size] = '\0';
-		free(m_data);
-		m_data = new_data;
-		m_capacity = new_capacity;
-	}
 }

@@ -53,7 +53,7 @@ namespace danikk_framework
 		}
 	}
 
-	template<class pathT> void readFileAsString(const pathT& path, GenericString& output, const GenericString& characters_to_ignore)
+	template<class pathT, class output_t, class ignore_t> void readFileAsString(const pathT& path, output_t& output, const ignore_t& characters_to_ignore)
 	{
         FileReader reader;
         reader.open(path);

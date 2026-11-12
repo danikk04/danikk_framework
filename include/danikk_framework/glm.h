@@ -93,7 +93,7 @@ namespace danikk_framework
 	{
 		String first;
 		String second;
-		const char* space_ptr = data.find(separator);
+		const char* space_ptr = data.findPtr(separator);
 		if(space_ptr == NULL)
 		{
 			return glm::ivec2(0, 0);

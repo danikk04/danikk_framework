@@ -3,6 +3,8 @@
 #include <danikk_framework/danikk_framework.h>
 #include <danikk_framework/assert.h>
 #include <cstdlib>
+#include <new>
+#include <type_traits>
 #include <danikk_framework/memory.h>
 
 namespace danikk_framework
@@ -28,19 +30,11 @@ namespace danikk_framework
 		}
 		DynamicArray(const DynamicArray<value_t>& other)
 		{
-			m_size = other.size();
-			m_capacity = m_size;
-            m_data = (value_t*)malloc(size());
-            const value_t* read_ptr = other.begin();
-            value_t* write_ptr = this->begin();
-            const value_t* end_read_ptr = other.end();
-            while(read_ptr < end_read_ptr)
-            {
-            	const value_t& read = *read_ptr++;
-            	value_t& write = *write_ptr++;
-            	write = read;
-            }
-            //memcpy(m_data, other.m_data, m_size);
+			m_data = NULL;
+			m_size = 0;
+			m_capacity = 0;
+			reservesize(other.size());
+			for(const value_t& value : other) push(value);
 		}
 
         DynamicArray(DynamicArray<value_t>&& other)
@@ -67,28 +61,20 @@ namespace danikk_framework
 
 		DynamicArray(size_t lenght, value_t filler)
 		{
-			m_size = lenght;
-			m_capacity = lenght;
-			m_data = malloc(m_capacity  * elementSize);
-			fill(filler);
+			m_data = NULL;
+			m_size = 0;
+			m_capacity = 0;
+			reservesize(lenght);
+			for(size_t i = 0; i < lenght; ++i) push(filler);
 		}
 
 		template<class argT> DynamicArray(InitList<argT> data)
 		{
-			m_size = data.size();
-			m_capacity = m_size;
-			m_data = (value_t*)malloc(m_capacity * elementSize);
-
-			value_t* thisIterator = begin();
-			value_t* thisEnd = end();
-			const argT* dataIterator = data.begin();
-
-			while(thisIterator < thisEnd)
-			{
-				*thisIterator = danikk_framework::move(value_t(*dataIterator));
-				thisIterator++;
-				dataIterator++;
-			}
+			m_data = NULL;
+			m_size = 0;
+			m_capacity = 0;
+			reservesize(data.size());
+			for(const argT& value : data) push(value_t(value));
 		}
 
 		DynamicArray<value_t>& operator=(const DynamicArray<value_t>& other)
@@ -103,6 +89,7 @@ namespace danikk_framework
 
 		DynamicArray<value_t>& operator=(DynamicArray<value_t>&& other)
 		{
+			clear();
 			if(m_data != NULL)
 			{
 				free(m_data);
@@ -118,6 +105,7 @@ namespace danikk_framework
 
 		~DynamicArray()
 		{
+			clear();
             if (m_data != NULL)
 			{
 				free(m_data);
@@ -194,35 +182,28 @@ namespace danikk_framework
 
 		void reservesize(size_t count)
 		{
-			if(m_capacity >= count)												//Если вместимости хватает.
+			if(m_capacity >= count) return;
+			size_t new_capacity = m_capacity == 0 ? 1 : m_capacity;
+			if(count < 2048)
+				while(new_capacity < count) new_capacity *= 2;
+			else
+				new_capacity = count;
+
+			value_t* new_data = (value_t*)malloc(elementSize * new_capacity);
+			if constexpr(std::is_trivially_copyable_v<value_t>)
 			{
-				return;															//То ничего не делает.
-			}
-			else if(m_data != NULL && m_capacity != 0)
-			{
-				while(m_capacity < count)										//Если память была выделена до этого
-				{
-					m_capacity *= 2;
-				}
-				m_data = (value_t*)(*&realloc)(m_data, m_capacity * elementSize);//то "расширяет" её в 2 раза, пока необходимая вместимость не будет достигнута.
-				return;
+				if(m_size != 0) std::memcpy(new_data, m_data, elementSize * m_size);
 			}
 			else
 			{
-				m_capacity = 1;
-				if(count < 2048)
-				{
-					while(m_capacity < count)
-					{
-						m_capacity *= 2;
-					}
-				}
-				else
-				{
-					m_capacity = count;
-				}
-				m_data = (value_t*)malloc(elementSize * m_capacity);
+				for(size_t i = 0; i < m_size; ++i)
+					new (&new_data[i]) value_t(danikk_framework::move(m_data[i]));
+				for(size_t i = 0; i < m_size; ++i)
+					m_data[i].~value_t();
 			}
+			::free(m_data);
+			m_data = new_data;
+			m_capacity = new_capacity;
 		}
 
 		void reserve(size_t count)
@@ -230,75 +211,29 @@ namespace danikk_framework
 			reservesize(count + m_size);
 		}
 
-		//Изменяет размер массива, не вызывает деструкторы/конструкторы
+		//Изменяет размер массива с созданием или уничтожением элементов.
 		void rawResize(size_t newsize)
 		{
-			reservesize(newsize);
-			m_size = newsize;
+			resize(newsize);
 		}
 
 		void resize(size_t newsize)
 		{
-			if(newsize == size())
+			if(newsize < m_size)
 			{
+				while(newsize < m_size) (&m_data[--m_size])->~value_t();
 				return;
 			}
-			else if(size() == 0)
-			{
-				reservesize(newsize);
-				m_size = newsize;
-			}
-			else if(newsize > size())
-			{
-				reservesize(newsize);
-				m_size = newsize;
-			}
-			else
-			{
-				while(newsize < m_size)
-				{
-					m_size--;
-					(&m_data[m_size])->~value_t();
-				}
-			}
+			reservesize(newsize);
+			while(m_size < newsize) new (&m_data[m_size++]) value_t();
 		}
 
 		//Изменяет размер массива, инициализируя элементы заданным значением.
 		void resize(size_t newsize, const value_t& baseElement)
 		{
-			if(newsize == size())
-			{
-				return;
-			}
-			else if(size() == 0)
-			{
-				reservesize(newsize);
-				m_size = newsize;
-				for(value_t& value : *this)
-				{
-					value = baseElement;
-				}
-			}
-			else if(newsize > size())
-			{
-				index_t index = size();
-				reservesize(newsize);
-				m_size = newsize;
-
-				while(index < size())
-				{
-					m_data[index] = baseElement;
-					index++;
-				}
-			}
-			else
-			{
-				while(newsize < m_size)
-				{
-					m_size--;
-					(&m_data[m_size])->~value_t();
-				}
-			}
+			if(newsize < m_size) { resize(newsize); return; }
+			reservesize(newsize);
+			while(m_size < newsize) new (&m_data[m_size++]) value_t(baseElement);
 		}
 
 		//Все push функции возвращают ссылку на добавленный элемент в массиве.
@@ -306,10 +241,8 @@ namespace danikk_framework
 		value_t& push(const value_t& newElement)
 		{
 			reserve(1);
-			value_t& result = m_data[m_size];
-			m_size++;
-			result = newElement;
-			return result;
+			new (&m_data[m_size]) value_t(newElement);
+			return m_data[m_size++];
 		}
 
 		value_t& pushCtor()

@@ -93,7 +93,7 @@ namespace danikk_framework
 	{
 		const char* lastPointPtr = path.findLast('.');
 		const char* lastPathSlashPtr = path.findLast(pathSlash);
-		const char* end = result.end();
+		const char* end = path.data() + path.size();
 
 		getNameFromPathPtrs(lastPointPtr, lastPathSlashPtr, end, result);
 	}

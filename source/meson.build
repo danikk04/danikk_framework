@@ -7,7 +7,6 @@ source = files(
 	'cstring.cpp',
 	'datetime.cpp',
 	'filesystem.cpp',
-	'generic_string.cpp',
 	'zip.cpp',
 	'filestream.cpp',
 	'line_getter.cpp',
