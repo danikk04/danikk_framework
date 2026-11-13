@@ -12,6 +12,7 @@
 #endif
 
 #include <danikk_framework/memory.h>
+#include <danikk_framework/log.h>
 
 namespace danikk_framework
 {
@@ -63,5 +64,51 @@ namespace danikk_framework
 #else
 		return 0;
 #endif
+	}
+
+	void checkRSS(const char* name)
+	{
+		static bool has_previous_sample = false;
+		static size_t previous_rss_bytes = 0;
+
+		const char* checkpoint_name = name == nullptr ? "unnamed" : name;
+		const size_t current_rss_bytes = getProcessMemoryUsageBytes();
+		if(current_rss_bytes == 0)
+		{
+			formatLogWarning("RSS checkpoint '%': unable to read process memory usage", checkpoint_name);
+			return;
+		}
+
+		if(!has_previous_sample)
+		{
+			formatLogMemory(
+				"RSS checkpoint '%': % bytes (% MiB, baseline)",
+				checkpoint_name,
+				current_rss_bytes,
+				current_rss_bytes / mib(1));
+			has_previous_sample = true;
+		}
+		else if(current_rss_bytes >= previous_rss_bytes)
+		{
+			formatLogMemory(
+				"RSS checkpoint '%': % bytes (% MiB), change: +% bytes (+% MiB)",
+				checkpoint_name,
+				current_rss_bytes,
+				current_rss_bytes / mib(1),
+				current_rss_bytes - previous_rss_bytes,
+				(current_rss_bytes - previous_rss_bytes) / mib(1));
+		}
+		else
+		{
+			formatLogMemory(
+				"RSS checkpoint '%': % bytes (% MiB), change: -% bytes (-% MiB)",
+				checkpoint_name,
+				current_rss_bytes,
+				current_rss_bytes / mib(1),
+				previous_rss_bytes - current_rss_bytes,
+				(previous_rss_bytes - current_rss_bytes) / mib(1));
+		}
+
+		previous_rss_bytes = current_rss_bytes;
 	}
 }

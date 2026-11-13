@@ -43,6 +43,9 @@ namespace danikk_framework
 	// Returns the process resident memory size in bytes, or 0 when unavailable.
 	size_t getProcessMemoryUsageBytes();
 
+	// Logs the current process RSS and its change since the previous successful check.
+	void checkRSS(const char* name);
+
 #if IS_DEBUG
 #define malloc(arg) danikk_framework::malloc_debug(__PRETTY_FUNCTION__, arg);
 #define realloc(arg, size) danikk_framework::realloc_debug(__PRETTY_FUNCTION__, arg, size);
