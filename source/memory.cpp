@@ -16,6 +16,14 @@
 
 namespace danikk_framework
 {
+	namespace
+	{
+		const char* rss_checkpoint_name = nullptr;
+		size_t rss_checkpoint_bytes = 0;
+		bool rss_checkpoint_active = false;
+		bool rss_checkpoint_open = false;
+	}
+
 	size_t getProcessMemoryUsageBytes()
 	{
 #if defined(_WIN32)
@@ -66,49 +74,65 @@ namespace danikk_framework
 #endif
 	}
 
-	void checkRSS(const char* name)
+	void checkRSSBegin(const char* name)
 	{
-		static bool has_previous_sample = false;
-		static size_t previous_rss_bytes = 0;
-
-		const char* checkpoint_name = name == nullptr ? "unnamed" : name;
-		const size_t current_rss_bytes = getProcessMemoryUsageBytes();
-		if(current_rss_bytes == 0)
+		if(rss_checkpoint_open)
 		{
-			formatLogWarning("RSS checkpoint '%': unable to read process memory usage", checkpoint_name);
+			formatLogWarning("RSS checkpoint '%': ended implicitly by a new checkpoint", rss_checkpoint_name);
+			checkRSSEnd();
+		}
+
+		rss_checkpoint_name = name == nullptr ? "unnamed" : name;
+		rss_checkpoint_bytes = getProcessMemoryUsageBytes();
+		rss_checkpoint_open = true;
+		rss_checkpoint_active = rss_checkpoint_bytes != 0;
+		if(!rss_checkpoint_active)
+		{
+			formatLogWarning("RSS checkpoint '%': unable to read starting process memory usage", rss_checkpoint_name);
+		}
+	}
+
+	void checkRSSEnd()
+	{
+		if(!rss_checkpoint_open)
+		{
+			formatLogWarning("RSS checkpoint end called without begin");
+			return;
+		}
+		if(!rss_checkpoint_active)
+		{
+			rss_checkpoint_open = false;
+			rss_checkpoint_name = nullptr;
 			return;
 		}
 
-		if(!has_previous_sample)
+		const size_t current_rss_bytes = getProcessMemoryUsageBytes();
+		if(current_rss_bytes == 0)
+		{
+			formatLogWarning("RSS checkpoint '%': unable to read ending process memory usage", rss_checkpoint_name);
+		}
+		else if(current_rss_bytes >= rss_checkpoint_bytes)
 		{
 			formatLogMemory(
-				"RSS checkpoint '%': % bytes (% MiB, baseline)",
-				checkpoint_name,
+				"RSS checkpoint '%': +% bytes (+% MiB), RSS: % bytes (% MiB)",
+				rss_checkpoint_name,
+				current_rss_bytes - rss_checkpoint_bytes,
+				(current_rss_bytes - rss_checkpoint_bytes) / mib(1),
 				current_rss_bytes,
 				current_rss_bytes / mib(1));
-			has_previous_sample = true;
-		}
-		else if(current_rss_bytes >= previous_rss_bytes)
-		{
-			formatLogMemory(
-				"RSS checkpoint '%': % bytes (% MiB), change: +% bytes (+% MiB)",
-				checkpoint_name,
-				current_rss_bytes,
-				current_rss_bytes / mib(1),
-				current_rss_bytes - previous_rss_bytes,
-				(current_rss_bytes - previous_rss_bytes) / mib(1));
 		}
 		else
 		{
 			formatLogMemory(
-				"RSS checkpoint '%': % bytes (% MiB), change: -% bytes (-% MiB)",
-				checkpoint_name,
+				"RSS checkpoint '%': -% bytes (-% MiB), RSS: % bytes (% MiB)",
+				rss_checkpoint_name,
+				rss_checkpoint_bytes - current_rss_bytes,
+				(rss_checkpoint_bytes - current_rss_bytes) / mib(1),
 				current_rss_bytes,
-				current_rss_bytes / mib(1),
-				previous_rss_bytes - current_rss_bytes,
-				(previous_rss_bytes - current_rss_bytes) / mib(1));
+				current_rss_bytes / mib(1));
 		}
-
-		previous_rss_bytes = current_rss_bytes;
+		rss_checkpoint_active = false;
+		rss_checkpoint_open = false;
+		rss_checkpoint_name = nullptr;
 	}
 }

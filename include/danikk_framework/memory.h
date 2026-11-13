@@ -43,8 +43,28 @@ namespace danikk_framework
 	// Returns the process resident memory size in bytes, or 0 when unavailable.
 	size_t getProcessMemoryUsageBytes();
 
-	// Logs the current process RSS and its change since the previous successful check.
-	void checkRSS(const char* name);
+	// Captures RSS before a measured call; checkRSSEnd logs its change.
+	void checkRSSBegin(const char* name);
+	void checkRSSEnd();
+
+	namespace internal
+	{
+		class RSSDiffScope
+		{
+		public:
+			explicit RSSDiffScope(const char* name) { checkRSSBegin(name); }
+			RSSDiffScope(const RSSDiffScope&) = delete;
+			RSSDiffScope& operator=(const RSSDiffScope&) = delete;
+			~RSSDiffScope() { checkRSSEnd(); }
+		};
+	}
+
+	#define launchCheckRSSDiff(...) \
+		do \
+		{ \
+			::danikk_framework::internal::RSSDiffScope rss_diff_scope(#__VA_ARGS__); \
+			__VA_ARGS__; \
+		} while(false)
 
 #if IS_DEBUG
 #define malloc(arg) danikk_framework::malloc_debug(__PRETTY_FUNCTION__, arg);
