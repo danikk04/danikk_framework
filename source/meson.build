@@ -13,6 +13,7 @@ source = files(
 	'localization.cpp',
 	'main.cpp',
 	'math.cpp',
+	'memory.cpp',
 	'memory_buffer.cpp',
 	'new_delete_redefine.cpp',
 	'path_buffer.cpp',

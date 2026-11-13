@@ -39,6 +39,10 @@ namespace danikk_framework
 	void* malloc_debug(const char* message, size_t s);
 
 	void* realloc_debug(const char* message, void* ptr, size_t s);
+
+	// Returns the process resident memory size in bytes, or 0 when unavailable.
+	size_t getProcessMemoryUsageBytes();
+
 #if IS_DEBUG
 #define malloc(arg) danikk_framework::malloc_debug(__PRETTY_FUNCTION__, arg);
 #define realloc(arg, size) danikk_framework::realloc_debug(__PRETTY_FUNCTION__, arg, size);
