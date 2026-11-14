@@ -18,6 +18,7 @@ namespace danikk_framework
 
 	static void tracer(int code)
 	{
+		std::signal(code, SIG_DFL);
 		switch(code)
 		{
 			#define CASE(CODE) case CODE: logFatal(#CODE); break;
@@ -25,6 +26,7 @@ namespace danikk_framework
 			CASE(SIGSEGV);
 		}
 		trace();
+		std::raise(code);
 	}
 
 	void traceSegfault()

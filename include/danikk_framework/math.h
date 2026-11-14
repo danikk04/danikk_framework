@@ -1,5 +1,6 @@
 #pragma once
 #include <danikk_framework/danikk_framework.h>
+#include <cmath>
 
 namespace danikk_framework
 {
@@ -83,6 +84,11 @@ namespace danikk_framework
 	inline float truncateTo100(float value)
 	{
 		return ((float)(int)(value * 100.0f)) / 100.0f;
+	}
+
+	inline double truncateTo100(double value)
+	{
+		return std::trunc(value * 100.0) / 100.0;
 	}
 
 	inline int mod(int a, int b)

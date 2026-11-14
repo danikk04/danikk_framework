@@ -18,6 +18,7 @@ namespace danikk_framework
 	using glm::uvec3;
 	using glm::ivec3;
 	using glm::vec3;
+	using glm::dvec3;
 
 #define pi glm::pi<float>()
 
@@ -55,6 +56,12 @@ namespace danikk_framework
 	}
 
 	LOG_OPERATOR(glm::vec3 data)
+	{
+		formatWrite(out, "%/%/%", data.x, data.y, data.z);
+		return out;
+	}
+
+	LOG_OPERATOR(glm::dvec3 data)
 	{
 		formatWrite(out, "%/%/%", data.x, data.y, data.z);
 		return out;
@@ -193,6 +200,11 @@ namespace danikk_framework
 	inline vec3 truncateTo100(vec3 vector)
 	{
 		return vec3(truncateTo100(vector.x), truncateTo100(vector.y), truncateTo100(vector.z));
+	}
+
+	inline dvec3 truncateTo100(dvec3 vector)
+	{
+		return dvec3(truncateTo100(vector.x), truncateTo100(vector.y), truncateTo100(vector.z));
 	}
 
 	inline vec3 spreadDirection(vec3 direction, float random_factor)
