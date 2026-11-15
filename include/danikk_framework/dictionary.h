@@ -120,13 +120,13 @@ namespace danikk_framework
 		}
 	};
 
-	template<class size_t> class DynamicInlineStringDictionary
+	template<class offset_t> class DynamicInlineStringDictionary
 	{
-		char* m_data;
+		char* m_data = nullptr;
 		struct key_value_pair
 		{
-			size_t key_offset;
-			size_t value_offset;
+			offset_t key_offset;
+			offset_t value_offset;
 		};
 		DynamicArray<key_value_pair> m_array;
 	public:
@@ -135,7 +135,12 @@ namespace danikk_framework
 			m_data = data;
 		}
 
-		void addPair(size_t key, size_t value)
+		void clear()
+		{
+			m_array.clear();
+		}
+
+		void addPair(offset_t key, offset_t value)
 		{
 			m_array.push(key_value_pair{key, value});
 		}
