@@ -184,10 +184,7 @@ namespace danikk_framework
 		{
 			if(m_capacity >= count) return;
 			size_t new_capacity = m_capacity == 0 ? 1 : m_capacity;
-			if(count < 2048)
-				while(new_capacity < count) new_capacity *= 2;
-			else
-				new_capacity = count;
+			while(new_capacity < count) new_capacity *= 2;
 
 			value_t* new_data = (value_t*)malloc(elementSize * new_capacity);
 			if constexpr(std::is_trivially_copyable_v<value_t>)
