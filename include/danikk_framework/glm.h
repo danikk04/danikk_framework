@@ -156,7 +156,7 @@ namespace danikk_framework
 
 	template<class vec2, class val> bool inRange(const vec2& range, const val& value)
 	{
-		return (value > range.x) && (value < range.y);
+		return (value >= range.x) && (value < range.y);
 	}
 
 	template<class vec2> vec2 index2Pos(int index, size_t size)
