@@ -132,8 +132,8 @@ namespace danikk_framework
 		void runWorker();
 
 	public:
-		/** @brief Starts the requested number of workers; zero selects hardware concurrency. */
-		explicit ThreadPool(size_t worker_count = 0);
+		/** @brief Creates an empty pool without starting worker threads. */
+		ThreadPool() = default;
 		~ThreadPool();
 		ThreadPool(const ThreadPool&) = delete;
 		ThreadPool& operator=(const ThreadPool&) = delete;
@@ -148,6 +148,8 @@ namespace danikk_framework
 		}
 		/** @brief Waits for queued work to finish, then joins every worker. */
 		void shutdown();
+		/** @brief Starts the requested number of worker threads; zero leaves the pool without workers. */
+		void initialize(size_t worker_count);
 		/** @brief Number of worker threads created by this pool. */
 		size_t workerCount() const { return configured_worker_count; }
 	};

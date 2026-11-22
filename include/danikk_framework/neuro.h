@@ -41,7 +41,9 @@ namespace danikk_framework
 	private:
 		static ThreadPool& getTaskThreadPool()
 		{
-			static ThreadPool pool(MULTI_TASK_MUTATE_TASK_COUNT);
+			static ThreadPool pool;
+			static const bool initialized = (pool.initialize(MULTI_TASK_MUTATE_TASK_COUNT), true);
+			(void)initialized;
 			return pool;
 		}
 

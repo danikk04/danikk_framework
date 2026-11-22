@@ -65,23 +65,33 @@ namespace danikk_framework
 		state->completed_condition.notify_all();
 	}
 
-	ThreadPool::ThreadPool(size_t worker_count)
+	void ThreadPool::initialize(size_t worker_count)
 	{
-		if(worker_count == 0)
-		{
-			const unsigned int hardware_threads = std::thread::hardware_concurrency();
-			worker_count = hardware_threads > 1 ? hardware_threads - 1 : 1;
-		}
+		std::unique_lock<std::mutex> lock(mutex);
+		if(!queued_tasks.empty())
+			throw std::logic_error("Cannot initialize a ThreadPool with queued tasks");
+		if(!workers.empty())
+			throw std::logic_error("ThreadPool is already initialized");
+		stopping = false;
 		configured_worker_count = worker_count;
-		workers.reserve(worker_count);
+		if(worker_count == 0) return;
 		try
 		{
+			workers.reserve(worker_count);
 			for(size_t index = 0; index < worker_count; ++index)
 				workers.emplace_back(&ThreadPool::runWorker, this);
 		}
 		catch(...)
 		{
-			shutdown();
+			stopping = true;
+			lock.unlock();
+			task_available.notify_all();
+			for(std::thread& worker : workers)
+				if(worker.joinable()) worker.join();
+			lock.lock();
+			workers.clear();
+			configured_worker_count = 0;
+			stopping = false;
 			throw;
 		}
 	}
@@ -93,6 +103,7 @@ namespace danikk_framework
 		if(!task.state) throw std::invalid_argument("Cannot submit an empty Task");
 		std::unique_lock<std::mutex> pool_lock(mutex);
 		if(stopping) throw std::logic_error("Cannot submit to a stopped ThreadPool");
+		if(workers.empty()) throw std::logic_error("Cannot submit to a ThreadPool without worker threads");
 		{
 			std::lock_guard<std::mutex> task_lock(task.state->mutex);
 			if(task.state->submitted || task.state->completed || !task.state->function)
@@ -134,13 +145,19 @@ namespace danikk_framework
 	{
 		{
 			std::lock_guard<std::mutex> guard(mutex);
-			if(workers.empty()) return;
+			if(workers.empty())
+			{
+				stopping = true;
+				configured_worker_count = 0;
+				return;
+			}
 			stopping = true;
 		}
 		task_available.notify_all();
 		for(std::thread& worker : workers)
 			if(worker.joinable()) worker.join();
 		workers.clear();
+		configured_worker_count = 0;
 	}
 
 	thread_local Thread* this_thread = NULL;
