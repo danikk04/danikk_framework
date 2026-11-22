@@ -7,6 +7,7 @@
 #include <danikk_framework/log.h>
 #include <danikk_framework/sub_array.h>
 #include <danikk_framework/math.h>
+#include <danikk_framework/thread.h>
 #include <danikk_framework/hex.h>
 #include "memory_buffer.h"
 
@@ -38,6 +39,12 @@ namespace danikk_framework
 			neuron(float default_neuro_k) : k(default_neuro_k){}
 		};
 	private:
+		static ThreadPool& getTaskThreadPool()
+		{
+			static ThreadPool pool(MULTI_TASK_MUTATE_TASK_COUNT);
+			return pool;
+		}
+
 		struct layer
 		{
 			DynamicArray<neuron> neurons;
@@ -194,7 +201,7 @@ namespace danikk_framework
 						task.weights = SubArray<float>(cur->weights.data() + weight_offset, target_weights_block_size);
 						task.neurons = SubArray<neuron>(cur->neurons.data() + neuron_offset, target_block_size);
 						task.prev_neurons = SubArray<neuron>(prev->neurons.data(), prev->neurons.size());
-						//task.task = Task(multiTaskSubActivate , (void*)&task);
+						task.task = getTaskThreadPool().submit(Task(multiTaskSubActivate, &task));
 						neuron_offset += target_block_size;
 						weight_offset += target_block_size * task.prev_neurons.size();
 					}
@@ -410,13 +417,13 @@ namespace danikk_framework
 				free_task->is_weight_mutate = false;
 				free_task->step = step;
 				free_task->neurons = &layer.neurons;
-				new (&free_task->task) Task(multiTaskSubMutate, (void*)free_task);
+				free_task->task = getTaskThreadPool().submit(Task(multiTaskSubMutate, free_task));
 
 				free_task = task_container.get();
 				free_task->is_weight_mutate = true;
 				free_task->step = step;
 				free_task->weights = &layer.weights;
-				new (&free_task->task) Task(multiTaskSubMutate, (void*)free_task);
+				free_task->task = getTaskThreadPool().submit(Task(multiTaskSubMutate, free_task));
 			}
 			task_container.waitFor();
 		}
