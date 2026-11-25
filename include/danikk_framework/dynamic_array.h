@@ -50,6 +50,10 @@ namespace danikk_framework
 			m_capacity = capacity;
 			m_data = (value_t*)malloc(m_capacity * elementSize);
 			m_size = 0;
+			if(m_data != NULL)
+			{
+				DSE_REGISTER_MEMORY_ALLOC(value_t, m_capacity);
+			}
 		}
 
 		DynamicArray(value_t* ptr, size_t lenght)
@@ -57,6 +61,10 @@ namespace danikk_framework
 			m_data = ptr;
 			m_size = lenght;
 			m_capacity = lenght;
+			if(m_data != NULL)
+			{
+				DSE_REGISTER_MEMORY_ALLOC(value_t, m_capacity);
+			}
 		}
 
 		DynamicArray(size_t lenght, value_t filler)
@@ -92,6 +100,7 @@ namespace danikk_framework
 			clear();
 			if(m_data != NULL)
 			{
+				DSE_REGISTER_MEMORY_DEALLOC(value_t, m_capacity);
 				free(m_data);
 			}
 			m_data = other.m_data;
@@ -108,6 +117,7 @@ namespace danikk_framework
 			clear();
             if (m_data != NULL)
 			{
+				DSE_REGISTER_MEMORY_DEALLOC(value_t, m_capacity);
 				free(m_data);
 				m_data = NULL;
 			}
@@ -184,9 +194,17 @@ namespace danikk_framework
 		{
 			if(m_capacity >= count) return;
 			size_t new_capacity = m_capacity == 0 ? 1 : m_capacity;
-			while(new_capacity < count) new_capacity *= 2;
+			while(new_capacity < count)
+			{
+				new_capacity *= 2;
+			}
 
 			value_t* new_data = (value_t*)malloc(elementSize * new_capacity);
+			if(new_data == NULL)
+			{
+				return;
+			}
+			DSE_REGISTER_MEMORY_REALLOC(value_t, m_data == NULL ? 0 : m_capacity, m_data == NULL ? 0 : elementSize * m_capacity, new_capacity, elementSize * new_capacity);
 			if constexpr(std::is_trivially_copyable_v<value_t>)
 			{
 				if(m_size != 0) std::memcpy(new_data, m_data, elementSize * m_size);
